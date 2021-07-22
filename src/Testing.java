@@ -241,6 +241,16 @@ public class Testing extends JFrame {
         });
         context.add(menuItem);
 
+        menuItem = new JMenuItem("Clear All");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Delete All");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
+            }
+        });
+        voidContext.add(menuItem);
 
         //adding reactions to certain clicks
         graphComponent.getGraphControl().addMouseListener(new MouseListener() {
@@ -295,7 +305,8 @@ public class Testing extends JFrame {
 
         //todo add a dialog box to kick start the diagram (potentially always available)
         //todo make sure nodes arent repeated
-        //todo add multiple select for delete AND delete all
+        //todo add multiple select for delete
+        //todo write up email on what to add to menus
         Testing frame = new Testing();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
