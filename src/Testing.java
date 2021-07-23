@@ -228,15 +228,15 @@ public class Testing extends JFrame {
         voidContext.add(menuItem);
 
         //adding deleting cells to the context menu
-        menuItem = new JMenuItem("Delete Cell");
+        menuItem = new JMenuItem("Delete Selected Cell(s)");
         menuItem.setMnemonic(KeyEvent.VK_P);
-        menuItem.getAccessibleContext().setAccessibleDescription("Delete Cell");
+        menuItem.getAccessibleContext().setAccessibleDescription("Delete Selected Cell(s)");
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Object obj = graphComponent.getCellAt(currX, currY);
-
-                graph.removeCells(new Object[]{obj});
+                //puts all currently selected cells into a variable
+                Object[] var = graph.getSelectionCells();
+                graph.removeCells(var);
             }
         });
         context.add(menuItem);
@@ -300,7 +300,7 @@ public class Testing extends JFrame {
 
     }
 
-    //Early testing to get used to all the new functons I will be using as part of this project
+    //Early testing to get used to all the new functions I will be using as part of this project
     public static void main(String[] args) throws SQLException {
 
         //todo add a dialog box to kick start the diagram (potentially always available)
@@ -310,8 +310,8 @@ public class Testing extends JFrame {
         Testing frame = new Testing();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //sets the default size of the window
-        frame.setSize(400, 320);
+        //sets the default size of the window default 400, 320
+        frame.setSize(700, 520);
 
 
         //makes the window visible
