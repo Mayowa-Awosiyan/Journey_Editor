@@ -23,6 +23,7 @@ public class Testing extends JFrame {
     private int currX,currY;
 
     private int currLayout;
+    private String currType;
 
     JourneyDB journeyDB;
     //setting up undohandler that will keep track of edits
@@ -44,12 +45,14 @@ public class Testing extends JFrame {
         undoManager = new mxUndoManager();
         currY=0;
         currX=0;
+
         Object parent = graph.getDefaultParent();
 
         graph.getModel().beginUpdate();
 
         journeyDB= new JourneyDB();
-        ArrayList<String> cells = journeyDB.getData("Select * From main_members");
+        ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_members");
+        currType= "Member";
         try
         {
             //adding nodes and edges to the graph
@@ -59,8 +62,6 @@ public class Testing extends JFrame {
             Object v2 = graph.insertVertex(parent, null, "World!",
                     240, 150, 80, 30);
             graph.insertEdge(parent, null, "Edge", v1, v2);
-
-
              */
 
             //todo give a layout so it looks nice
@@ -68,9 +69,9 @@ public class Testing extends JFrame {
             int v1 = 20;
             int v2 =50;
             Object prevCell= null;
-            for (String currentCell:
+            for (MemberEntry currentCell:
                  cells) {
-                Object cell = graph.insertVertex(parent, null, currentCell,v1,v2,120, 50);
+                Object cell = graph.insertVertex(parent, null, currentCell,v1,v2,120, 50,currType);
                 v1+= 50;
                 v2+= 75;
 
@@ -79,9 +80,6 @@ public class Testing extends JFrame {
                 }
                 prevCell = cell;
             }
-
-
-
         }
         finally
         {
@@ -296,6 +294,39 @@ public class Testing extends JFrame {
         }
         );
 
+        menuItem = new JMenuItem("Show Events");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Object[] targets = graph.getSelectionCells();
+                for(Object addition : targets){
+                    ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_events,main_members,relp_Event_member" +
+                            " where main_members.ID = relp_event_member.member_Id and main_events.ID = relp_event_member.Event_id");
+                    try
+                    {
+                        int v1 = 20;
+                        int v2 =50;
+                        Object prevCell= addition;
+                        for (MemberEntry currentCell:
+                                cells) {
+                            Object cell = graph.insertVertex(parent, null, currentCell,v1,v2,120, 50,currType);
+                            v1+= 50;
+                            v2+= 75;
+                            if(prevCell != null){
+                                graph.insertEdge(parent,null, "",prevCell,cell);
+                            }
+                        }
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        context.add(menuItem);
+
 
 
     }
@@ -305,15 +336,12 @@ public class Testing extends JFrame {
 
         //todo add a dialog box to kick start the diagram (potentially always available)
         //todo make sure nodes arent repeated
-        //todo add multiple select for delete
         //todo write up email on what to add to menus
         Testing frame = new Testing();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //sets the default size of the window default 400, 320
         frame.setSize(700, 520);
-
-
         //makes the window visible
         frame.setVisible(true);
 

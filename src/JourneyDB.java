@@ -18,17 +18,19 @@ public class JourneyDB {
         connection = DriverManager.getConnection("jdbc:ucanaccess://SummerCOOPv2.accdb");
     }
     //todo make more flexible
-    public ArrayList<String> getData(String query){
-        ArrayList<String> cells = new ArrayList<>();
+    public ArrayList<MemberEntry> getMembers(String query){
+        ArrayList<MemberEntry> cells = new ArrayList<>();
 
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()){
-                String fname = resultSet.getString(1);
-                String lname=resultSet.getString(2);
-                String dateJ = resultSet.getString(4);
-                cells.add(fname+ " " + lname + "\n" + dateJ);
+                String id =resultSet.getString(1);
+                String fname= resultSet.getString(2);
+                String lname=resultSet.getString(3);
+                String dateJ = resultSet.getString(5);
+                MemberEntry entry = new MemberEntry(fname,dateJ,id,lname);
+                cells.add(entry);
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
