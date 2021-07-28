@@ -21,6 +21,9 @@ public class Testing extends JFrame {
     List<UndoableEdit> changes;
     //these 2 integer values help keep track of the currently selected cell for deleting purposes
     private int currX,currY;
+    //variable to hold the id of all Data Entries will be very important todo implement this fully with an arraylist that uses id as an index
+    private ProgressingLabel label;
+    private ArrayList<DataEntry> nodes;
 
     private int currLayout;
     private String currType;
@@ -45,6 +48,9 @@ public class Testing extends JFrame {
         undoManager = new mxUndoManager();
         currY=0;
         currX=0;
+        label= new ProgressingLabel("Label");
+        nodes= new ArrayList<>();
+        nodes.add(new DataEntry("Graph",null,null));
 
         Object parent = graph.getDefaultParent();
 
@@ -71,10 +77,12 @@ public class Testing extends JFrame {
             Object prevCell= null;
             for (MemberEntry currentCell:
                  cells) {
-                Object cell = graph.insertVertex(parent, null, currentCell,v1,v2,120, 50,currType);
+                //not having toString() causes errors that dont seem to affect the program
+                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
                 v1+= 50;
                 v2+= 75;
-
+                nodes.add(currentCell);
+                label.progress();
                 if(prevCell != null){
                     graph.insertEdge(parent,null, "",prevCell,cell);
                 }
@@ -114,7 +122,7 @@ public class Testing extends JFrame {
         //adding context menu when clicking a Node
         final JPopupMenu context = new JPopupMenu();
 
-        //adding context menu for when right clicking in the void, aka a node is not where right clicked occured
+        //adding context menu for when right clicking in the void, aka a node is not where right clicked occurred
         final JPopupMenu voidContext = new JPopupMenu();
         JMenuItem undo = new JMenuItem("Undo");
         undo.setMnemonic(KeyEvent.VK_P);
@@ -219,8 +227,12 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //todo change the postion a bit so it goes where expected
-                Object cell = graph.insertVertex(parent, null, "",getMousePosition().getX(),getMousePosition().getY(),120, 50);
+                //todo change the position a bit so it goes where expected
+                Object cell = graph.insertVertex(parent, label.toString(), "",getMousePosition().getX(),
+                        getMousePosition().getY(),120, 50);
+                label.progress();
+                //todo make this take in the data added to the cell/create class custom Entry
+                nodes.add(new DataEntry(null,null,null));
             }
         });
         voidContext.add(menuItem);
@@ -277,8 +289,6 @@ public class Testing extends JFrame {
                         currY= e.getY();
                         context.show(e.getComponent(),e.getX(),e.getY());
                     }
-
-
                 }
             }
 
@@ -302,18 +312,25 @@ public class Testing extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 Object[] targets = graph.getSelectionCells();
                 for(Object addition : targets){
+                    mxCell thing = (mxCell) addition;
+                    String targetID =thing.getId();
+
+                    System.out.println(targetID);
+
                     ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_events,main_members,relp_Event_member" +
                             " where main_members.ID = relp_event_member.member_Id and main_events.ID = relp_event_member.Event_id");
                     try
                     {
-                        int v1 = 20;
+                        int v1 = 100;
                         int v2 =50;
                         Object prevCell= addition;
                         for (MemberEntry currentCell:
                                 cells) {
-                            Object cell = graph.insertVertex(parent, null, currentCell,v1,v2,120, 50,currType);
+                            Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
                             v1+= 50;
                             v2+= 75;
+                            label.progress();
+                            nodes.add(currentCell);
                             if(prevCell != null){
                                 graph.insertEdge(parent,null, "",prevCell,cell);
                             }
@@ -324,11 +341,7 @@ public class Testing extends JFrame {
                 }
             }
         });
-
         context.add(menuItem);
-
-
-
     }
 
     //Early testing to get used to all the new functions I will be using as part of this project
