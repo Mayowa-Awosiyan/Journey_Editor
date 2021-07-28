@@ -1,8 +1,10 @@
+import java.util.Date;
+
 public class MemberEntry extends DataEntry{
 //todo add boolean for each variable that needs to toggle being seen
     private String lname;
     private String name;
-    private String date;
+    private Date date;
     private String id;
     private String email;
     private String business;
@@ -10,7 +12,7 @@ public class MemberEntry extends DataEntry{
     private String phone;
     private String city;
 
-    public MemberEntry(String name, String lname,String date, String id, String email, String business, String faculty, String phone, String city) {
+    public MemberEntry(String name, String lname,Date date, String id, String email, String business, String faculty, String phone, String city) {
 
         super(name, date, id);
         this.lname = lname;
@@ -21,7 +23,7 @@ public class MemberEntry extends DataEntry{
         this.city = city;
     }
 
-    public MemberEntry(String name, String date, String id, String lname) {
+    public MemberEntry(String name, Date date, String id, String lname) {
         super(name, date, id);
         this.name=name;
         this.id=id;
@@ -37,11 +39,11 @@ public class MemberEntry extends DataEntry{
         this.name = name;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

@@ -28,7 +28,7 @@ public class JourneyDB {
                 String id =resultSet.getString(1);
                 String fname= resultSet.getString(2);
                 String lname=resultSet.getString(3);
-                String dateJ = resultSet.getString(5);
+                Date dateJ = (Date) resultSet.getDate(5);
                 MemberEntry entry = new MemberEntry(fname,dateJ,id,lname);
                 cells.add(entry);
             }
@@ -38,7 +38,6 @@ public class JourneyDB {
 
         return cells;
     }
-
 
     public static void main(String[] args) {
         String url = "jdbc:ucanaccess://SummerCOOPv2.accdb";

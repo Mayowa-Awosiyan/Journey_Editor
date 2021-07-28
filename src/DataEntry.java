@@ -1,11 +1,13 @@
+import java.util.Date;
+
 //custom created class to hold information based on various
 public class DataEntry extends Object {
 
     protected String name;
-    protected String date;
+    protected Date date;
     protected String id;
 
-    public DataEntry(String name, String date, String id){
+    public DataEntry(String name, Date date, String id){
         this.name= name;
         this.date=date;
         this.id=id;
@@ -19,11 +21,11 @@ public class DataEntry extends Object {
         this.name = name;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
