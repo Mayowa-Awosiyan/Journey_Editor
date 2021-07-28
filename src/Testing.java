@@ -316,7 +316,7 @@ public class Testing extends JFrame {
                     String targetID =thing.getId();
 
                     System.out.println(targetID);
-
+                    System.out.println(nodes.get(label.getTarget(targetID)).toString());
                     ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_events,main_members,relp_Event_member" +
                             " where main_members.ID = relp_event_member.member_Id and main_events.ID = relp_event_member.Event_id");
                     try
