@@ -313,12 +313,12 @@ public class Testing extends JFrame {
                 Object[] targets = graph.getSelectionCells();
                 for(Object addition : targets){
                     mxCell thing = (mxCell) addition;
+                    //this is the id of the node
                     String targetID =thing.getId();
-
-                    System.out.println(targetID);
-                    System.out.println(nodes.get(label.getTarget(targetID)).toString());
-                    ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_events,main_members,relp_Event_member" +
-                            " where main_members.ID = relp_event_member.member_Id and main_events.ID = relp_event_member.Event_id");
+                    //this is the id in the database
+                    targetID = nodes.get(label.getTarget(targetID)).getId();
+                    ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_events, relp_Event_member" +
+                            " where " + targetID+ " = relp_Event_member.Member_ID and main_events.id = relp_event_member.Event_id");
                     try
                     {
                         int v1 = 100;
