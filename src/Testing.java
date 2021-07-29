@@ -27,6 +27,8 @@ public class Testing extends JFrame {
 
     private int currLayout;
     private String currType;
+    private ArrayList<Object> cellList;
+
 
     JourneyDB journeyDB;
     //setting up undohandler that will keep track of edits
@@ -51,7 +53,8 @@ public class Testing extends JFrame {
         label= new ProgressingLabel("Label");
         nodes= new ArrayList<>();
         nodes.add(new DataEntry("Graph",null,null));
-
+        cellList = new ArrayList<>();
+        cellList.add("Start Point");
         Object parent = graph.getDefaultParent();
 
         graph.getModel().beginUpdate();
@@ -82,6 +85,7 @@ public class Testing extends JFrame {
                 v1+= 50;
                 v2+= 75;
                 nodes.add(currentCell);
+                cellList.add(cell);
                 label.progress();
                 if(prevCell != null){
                     graph.insertEdge(parent,null, "",prevCell,cell);
@@ -310,38 +314,56 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Object[] targets = graph.getSelectionCells();
-                for(Object addition : targets){
-                    mxCell thing = (mxCell) addition;
-                    //this is the id of the node
-                    String targetID =thing.getId();
-                    //this is the id in the database
-                    targetID = nodes.get(label.getTarget(targetID)).getId();
-                    ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_events, relp_Event_member" +
-                            " where " + targetID+ " = relp_Event_member.Member_ID and main_events.id = relp_event_member.Event_id");
-                    try
-                    {
-                        int v1 = 100;
-                        int v2 =50;
-                        Object prevCell= addition;
-                        for (MemberEntry currentCell:
-                                cells) {
-                            Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
-                            v1+= 50;
-                            v2+= 75;
-                            label.progress();
-                            nodes.add(currentCell);
-                            if(prevCell != null){
-                                graph.insertEdge(parent,null, "",prevCell,cell);
-                            }
-                        }
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
-                    }
-                }
+                updateGraph(graph);
+
             }
         });
         context.add(menuItem);
+    }
+
+    public void updateGraph(mxGraph graph){
+        Object parent = graph.getDefaultParent();
+        Object[] targets = graph.getSelectionCells();
+        for(Object addition : targets){
+            mxCell thing = (mxCell) addition;
+            //this is the id of the node
+            String targetID =thing.getId();
+            //this is the id in the database
+            targetID = nodes.get(label.getTarget(targetID)).getId();
+            ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_member" +
+                    " where " + targetID+ " = relp_Event_member.Member_ID and main_events.id = relp_event_member.Event_id");
+            try
+            {
+                int v1 = 200;
+                int v2 =50;
+
+                for (EventEntry currentCell:
+                        cells) {
+
+                    if(nodes.contains(currentCell)){
+                        int target =nodes.indexOf(currentCell);
+                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
+                            ;
+                        }
+                        else {
+                            graph.insertEdge(parent,null,"",addition,cellList.get(target));
+                        }
+                    }
+                    else {
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                        v1+= 50;
+                        v2+= 75;
+                        label.progress();
+                        nodes.add(currentCell);
+                        cellList.add(cell);
+                        graph.insertEdge(parent,null, "",addition,cell);
+
+                    }
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
     }
 
     //Early testing to get used to all the new functions I will be using as part of this project

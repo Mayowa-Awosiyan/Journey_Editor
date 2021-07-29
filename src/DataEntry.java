@@ -7,6 +7,7 @@ public class DataEntry extends Object {
     protected Date date;
     protected String id;
 
+
     public DataEntry(String name, Date date, String id){
         this.name= name;
         this.date=date;
@@ -39,5 +40,21 @@ public class DataEntry extends Object {
 
     public String toString(){
         return name + "\n" + date;
+    }
+
+    public boolean equals(Object object){
+        if(object == null){
+            return false;
+        }
+        else if(object.getClass() != DataEntry.class){
+            return false;
+        }
+        else if(((DataEntry) object).getDate().equals(this.getDate()) && this.getId()== ((DataEntry) object).getId()
+            && this.getName() == ((DataEntry) object).getName()){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
