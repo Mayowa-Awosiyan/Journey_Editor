@@ -52,7 +52,7 @@ public class Testing extends JFrame {
         currX=0;
         label= new ProgressingLabel("Label");
         nodes= new ArrayList<>();
-        nodes.add(new DataEntry("Graph",null,null));
+        nodes.add(new DataEntry("Graph",null));
         cellList = new ArrayList<>();
         cellList.add("Start Point");
         Object parent = graph.getDefaultParent();
@@ -236,7 +236,7 @@ public class Testing extends JFrame {
                         getMousePosition().getY(),120, 50);
                 label.progress();
                 //todo make this take in the data added to the cell/create class custom Entry
-                nodes.add(new DataEntry(null,null,null));
+                nodes.add(new DataEntry(null,null));
                 cellList.add(cell);
             }
         });
@@ -321,6 +321,19 @@ public class Testing extends JFrame {
         });
         context.add(menuItem);
 
+        menuItem = new JMenuItem("Show Partners");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Partners");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphPartners(graph);
+
+            }
+        });
+        context.add(menuItem);
+
+
         menuItem = new JMenuItem("Show Grants");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Show Grants");
@@ -332,8 +345,20 @@ public class Testing extends JFrame {
             }
         });
         context.add(menuItem);
-    }
 
+        menuItem = new JMenuItem("Show Partners");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Partners");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphPartners(graph);
+
+            }
+        });
+        context.add(menuItem);
+    }
+    //functions that add the right nodes to the graph based on user request
     public void updateGraphEvents(mxGraph graph){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
@@ -397,6 +422,52 @@ public class Testing extends JFrame {
                 int v2 =50;
 
                 for (GrantEntry currentCell:
+                        cells) {
+
+                    if(nodes.contains(currentCell)){
+                        int target =nodes.indexOf(currentCell);
+                        //wont create new edges that are identical to existing ones
+                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
+                            ;
+                        }
+                        else {
+                            graph.insertEdge(parent,null,"",addition,cellList.get(target));
+                        }
+                    }
+                    else {
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                        v1+= 50;
+                        v2+= 75;
+                        label.progress();
+                        nodes.add(currentCell);
+                        cellList.add(cell);
+                        graph.insertEdge(parent,null, "",addition,cell);
+
+                    }
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
+
+    public void updateGraphPartners(mxGraph graph){
+        Object parent = graph.getDefaultParent();
+        Object[] targets = graph.getSelectionCells();
+        for(Object addition : targets){
+            mxCell thing = (mxCell) addition;
+            //this is the id of the node
+            String targetID =thing.getId();
+            //this is the id in the database
+            targetID = nodes.get(label.getTarget(targetID)).getId();
+            ArrayList<PartnerEntry> cells = journeyDB.getPartners("Select * From main_grants, relp_grant_member" +
+                    " where " + targetID+ " = relp_grant_member.Member_ID and main_grants.id = relp_grant_member.grant_id");
+            try
+            {
+                int v1 = 200;
+                int v2 =50;
+ n
+                for (PartnerEntry currentCell:
                         cells) {
 
                     if(nodes.contains(currentCell)){

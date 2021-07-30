@@ -10,12 +10,12 @@ public class EventEntry extends DataEntry{
 
 
 
-    public EventEntry(String name, Date date, String id) {
-        super(name, date, id);
+    public EventEntry(String name, String id) {
+        super(name, id);
     }
 
     public EventEntry(String name, Date date, String id, String frName, int type, Date endDate, String notes) {
-        super(name, date, id);
+        super(name, id);
 
         this.startDate=date;
         this.frName = frName;
@@ -69,5 +69,9 @@ public class EventEntry extends DataEntry{
         else {
             return false;
         }
+    }
+
+    public String toString(){
+        return name + "\n" + startDate;
     }
 }

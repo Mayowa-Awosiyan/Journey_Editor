@@ -1,16 +1,14 @@
-import java.util.Date;
+
 
 //custom created class to hold information based on various
 public class DataEntry extends Object {
 
     protected String name;
-    protected Date date;
     protected String id;
 
 
-    public DataEntry(String name, Date date, String id){
+    public DataEntry(String name, String id){
         this.name= name;
-        this.date=date;
         this.id=id;
     }
 
@@ -22,13 +20,6 @@ public class DataEntry extends Object {
         this.name = name;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
 
     public String getId() {
         return id;
@@ -39,7 +30,7 @@ public class DataEntry extends Object {
     }
 
     public String toString(){
-        return name + "\n" + date;
+        return name;
     }
 
     public boolean equals(Object object){
@@ -49,7 +40,7 @@ public class DataEntry extends Object {
         else if(object.getClass() != DataEntry.class){
             return false;
         }
-        else if(((DataEntry) object).getDate().equals(this.getDate()) && this.getId()== ((DataEntry) object).getId()
+        else if(this.getId()== ((DataEntry) object).getId()
             && this.getName() == ((DataEntry) object).getName()){
             return true;
         }

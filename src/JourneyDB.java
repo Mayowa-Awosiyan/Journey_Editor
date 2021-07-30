@@ -89,7 +89,28 @@ public class JourneyDB {
         return cells;
     }
 
+    public ArrayList<PartnerEntry> getPartners(String query){
+        ArrayList<PartnerEntry> cells = new ArrayList<>();
 
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                String id =resultSet.getString(1);
+                String fname= resultSet.getString(2);
+                int type =resultSet.getInt(5);
+                String notes = resultSet.getString(4);
+                int source = resultSet.getInt(3);
+
+                PartnerEntry entry = new PartnerEntry(fname,id,source,notes,type);
+                cells.add(entry);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return cells;
+    }
 
     public static void main(String[] args) {
         String url = "jdbc:ucanaccess://SummerCOOPv2.accdb";

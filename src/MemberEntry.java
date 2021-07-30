@@ -14,7 +14,8 @@ public class MemberEntry extends DataEntry{
 
     public MemberEntry(String name, String lname,Date date, String id, String email, String business, String faculty, String phone, String city) {
 
-        super(name, date, id);
+        super(name, id);
+        this.date = date;
         this.lname = lname;
         this.email = email;
         this.business = business;
@@ -24,7 +25,7 @@ public class MemberEntry extends DataEntry{
     }
 
     public MemberEntry(String name, Date date, String id, String lname) {
-        super(name, date, id);
+        super(name, id);
         this.name=name;
         this.id=id;
         this.date=date;
@@ -106,5 +107,31 @@ public class MemberEntry extends DataEntry{
 
     public String toString(){
         return name+ " " + lname +"\n"+  date;
+    }
+
+    public boolean equals(Object comp){
+        if(comp == null){
+
+            return false;
+        }
+        else if(comp.getClass() != MemberEntry.class){
+
+            return false;
+        }
+        else if(comp.getClass() == MemberEntry.class){
+            MemberEntry thing = (MemberEntry) comp;
+            //ids are unique between grant entries so only id needs to be compared as
+            // everything else can be identical for a different grant (tho rarely)
+            if(thing.getId().equals(this.getId())){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
     }
 }
