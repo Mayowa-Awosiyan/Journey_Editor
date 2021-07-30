@@ -460,13 +460,13 @@ public class Testing extends JFrame {
             String targetID =thing.getId();
             //this is the id in the database
             targetID = nodes.get(label.getTarget(targetID)).getId();
-            ArrayList<PartnerEntry> cells = journeyDB.getPartners("Select * From main_grants, relp_grant_member" +
-                    " where " + targetID+ " = relp_grant_member.Member_ID and main_grants.id = relp_grant_member.grant_id");
+            ArrayList<PartnerEntry> cells = journeyDB.getPartners("Select * From main_Partners, relp_Partner_member" +
+                    " where " + targetID+ " = relp_partner_member.Member_ID and main_partners.id = relp_partner_member.partner_id");
             try
             {
                 int v1 = 200;
                 int v2 =50;
- n
+
                 for (PartnerEntry currentCell:
                         cells) {
 
