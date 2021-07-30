@@ -63,6 +63,34 @@ public class JourneyDB {
         return cells;
     }
 
+    public ArrayList<GrantEntry> getGrants(String query){
+        ArrayList<GrantEntry> cells = new ArrayList<>();
+
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                String id =resultSet.getString(1);
+                String fname= resultSet.getString(2);
+                Float amount=resultSet.getFloat(3);
+                Date endDate = resultSet.getDate(7);
+                Date dateJ = resultSet.getDate(6);
+                String notes = resultSet.getString(10);
+                int source = resultSet.getInt(9);
+                Date fin = resultSet.getDate(8);
+
+                GrantEntry entry = new GrantEntry(fname,dateJ,id,endDate,fin,source,notes);
+                cells.add(entry);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return cells;
+    }
+
+
+
     public static void main(String[] args) {
         String url = "jdbc:ucanaccess://SummerCOOPv2.accdb";
 

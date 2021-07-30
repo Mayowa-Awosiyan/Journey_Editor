@@ -105,7 +105,6 @@ public class MemberEntry extends DataEntry{
 
 
     public String toString(){
-
         return name+ " " + lname +"\n"+  date;
     }
 }

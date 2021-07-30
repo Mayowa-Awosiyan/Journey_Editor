@@ -237,6 +237,7 @@ public class Testing extends JFrame {
                 label.progress();
                 //todo make this take in the data added to the cell/create class custom Entry
                 nodes.add(new DataEntry(null,null,null));
+                cellList.add(cell);
             }
         });
         voidContext.add(menuItem);
@@ -314,14 +315,26 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateGraph(graph);
+                updateGraphEvents(graph);
+
+            }
+        });
+        context.add(menuItem);
+
+        menuItem = new JMenuItem("Show Grants");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Grants");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphGrants(graph);
 
             }
         });
         context.add(menuItem);
     }
 
-    public void updateGraph(mxGraph graph){
+    public void updateGraphEvents(mxGraph graph){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
         for(Object addition : targets){
@@ -342,6 +355,53 @@ public class Testing extends JFrame {
 
                     if(nodes.contains(currentCell)){
                         int target =nodes.indexOf(currentCell);
+                        //wont create new edges that are identical to existing ones
+                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
+                            ;
+                        }
+                        else {
+                            graph.insertEdge(parent,null,"",addition,cellList.get(target));
+                        }
+                    }
+                    else {
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                        v1+= 50;
+                        v2+= 75;
+                        label.progress();
+                        nodes.add(currentCell);
+                        cellList.add(cell);
+                        graph.insertEdge(parent,null, "",addition,cell);
+
+                    }
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
+
+    public void updateGraphGrants(mxGraph graph){
+        Object parent = graph.getDefaultParent();
+        Object[] targets = graph.getSelectionCells();
+        for(Object addition : targets){
+            mxCell thing = (mxCell) addition;
+            //this is the id of the node
+            String targetID =thing.getId();
+            //this is the id in the database
+            targetID = nodes.get(label.getTarget(targetID)).getId();
+            ArrayList<GrantEntry> cells = journeyDB.getGrants("Select * From main_grants, relp_grant_member" +
+                    " where " + targetID+ " = relp_grant_member.Member_ID and main_grants.id = relp_grant_member.grant_id");
+            try
+            {
+                int v1 = 200;
+                int v2 =50;
+
+                for (GrantEntry currentCell:
+                        cells) {
+
+                    if(nodes.contains(currentCell)){
+                        int target =nodes.indexOf(currentCell);
+                        //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
                         }

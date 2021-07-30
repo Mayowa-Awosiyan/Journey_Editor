@@ -57,14 +57,12 @@ public class EventEntry extends DataEntry{
             return false;
         }
         else if(comp.getClass() == EventEntry.class){
-
             EventEntry thing = (EventEntry) comp;
+            //ids are unique between event entries so only id needs to be compared
             if(thing.getId().equals(this.getId())){
-                    System.out.println("ITS TRUE v");
                     return true;
             }
             else{
-                System.out.println("USED EVENT");
                 return false;
             }
         }
