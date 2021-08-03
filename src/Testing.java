@@ -522,7 +522,6 @@ public class Testing extends JFrame {
                             ;
                         }
                         else {
-                            System.out.println("FALSE");
                             graph.insertEdge(parent,null,"",addition,cellList.get(target));
                         }
                     }
