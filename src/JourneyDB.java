@@ -112,6 +112,32 @@ public class JourneyDB {
         return cells;
     }
 
+    public ArrayList<ProductEntry> getProducts(String query){
+        ArrayList<ProductEntry> cells = new ArrayList<>();
+
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                String id =resultSet.getString(1);
+                String fname= resultSet.getString(2);
+                Date date = resultSet.getDate(3);
+                boolean ongoing = resultSet.getBoolean(4);
+                boolean reviewed = resultSet.getBoolean(5);
+                String doi =resultSet.getString(6);
+                String notes = resultSet.getString(8);
+                int type = resultSet.getInt(9);
+
+                ProductEntry entry = new ProductEntry(fname,id,date,ongoing,reviewed,doi,notes,type);
+                cells.add(entry);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return cells;
+    }
+
     public static void main(String[] args) {
         String url = "jdbc:ucanaccess://SummerCOOPv2.accdb";
 

@@ -11,6 +11,7 @@ public class MemberEntry extends DataEntry{
     private String faculty;
     private String phone;
     private String city;
+    private boolean[] display;
 
     public MemberEntry(String name, String lname,Date date, String id, String email, String business, String faculty, String phone, String city) {
 
@@ -22,6 +23,7 @@ public class MemberEntry extends DataEntry{
         this.faculty = faculty;
         this.phone = phone;
         this.city = city;
+        this.display= new boolean[]{false, false, false, false, false, false};
     }
 
     public MemberEntry(String name, Date date, String id, String lname) {
@@ -30,6 +32,7 @@ public class MemberEntry extends DataEntry{
         this.id=id;
         this.date=date;
         this.lname = lname;
+        this.display= new boolean[] {false,false};
     }
 
     public String getName() {

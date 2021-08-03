@@ -33,4 +33,31 @@ public class PartnerEntry extends DataEntry{
     }
 
 
+    public boolean equals(Object comp){
+        if(comp == null){
+
+            return false;
+        }
+        else if(comp.getClass() != PartnerEntry.class){
+
+            return false;
+        }
+        else if(comp.getClass() == PartnerEntry.class){
+            PartnerEntry thing = (PartnerEntry) comp;
+            //ids are unique between grant entries so only id needs to be compared as
+            // everything else can be identical for a different grant (tho rarely)
+            if(thing.getId().equals(this.getId())){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+    }
+
+
 }

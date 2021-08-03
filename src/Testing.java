@@ -346,13 +346,13 @@ public class Testing extends JFrame {
         });
         context.add(menuItem);
 
-        menuItem = new JMenuItem("Show Partners");
+        menuItem = new JMenuItem("Show Products");
         menuItem.setMnemonic(KeyEvent.VK_P);
-        menuItem.getAccessibleContext().setAccessibleDescription("Show Partners");
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Products");
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateGraphPartners(graph);
+                updateGraphProducts(graph);
 
             }
         });
@@ -451,6 +451,51 @@ public class Testing extends JFrame {
         }
     }
 
+    public void updateGraphProducts(mxGraph graph){
+        Object parent = graph.getDefaultParent();
+        Object[] targets = graph.getSelectionCells();
+        for(Object addition : targets){
+            mxCell thing = (mxCell) addition;
+            //this is the id of the node
+            String targetID =thing.getId();
+            //this is the id in the database
+            targetID = nodes.get(label.getTarget(targetID)).getId();
+            ArrayList<ProductEntry> cells = journeyDB.getProducts("Select * From main_Products, relp_Product_member" +
+                    " where " + targetID+ " = relp_product_member.Member_ID and main_products.id = relp_product_member.product_id");
+            try
+            {
+                int v1 = 200;
+                int v2 =50;
+
+                for (ProductEntry currentCell:
+                        cells) {
+
+                    if(nodes.contains(currentCell)){
+                        int target =nodes.indexOf(currentCell);
+                        //wont create new edges that are identical to existing ones
+                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
+                            ;
+                        }
+                        else {
+                            graph.insertEdge(parent,null,"",addition,cellList.get(target));
+                        }
+                    }
+                    else {
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                        v1+= 50;
+                        v2+= 75;
+                        label.progress();
+                        nodes.add(currentCell);
+                        cellList.add(cell);
+                        graph.insertEdge(parent,null, "",addition,cell);
+                    }
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
+
     public void updateGraphPartners(mxGraph graph){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
@@ -477,6 +522,7 @@ public class Testing extends JFrame {
                             ;
                         }
                         else {
+                            System.out.println("FALSE");
                             graph.insertEdge(parent,null,"",addition,cellList.get(target));
                         }
                     }
@@ -488,7 +534,6 @@ public class Testing extends JFrame {
                         nodes.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell);
-
                     }
                 }
             } catch (Exception exception) {
@@ -496,6 +541,8 @@ public class Testing extends JFrame {
             }
         }
     }
+
+
 
     //Early testing to get used to all the new functions I will be using as part of this project
     public static void main(String[] args) throws SQLException {
