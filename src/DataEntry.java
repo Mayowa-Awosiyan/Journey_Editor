@@ -48,4 +48,8 @@ public class DataEntry extends Object {
             return false;
         }
     }
+
+    public void displayDate(int target){
+        ;
+    }
 }

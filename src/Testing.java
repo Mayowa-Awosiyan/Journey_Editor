@@ -123,8 +123,8 @@ public class Testing extends JFrame {
 
 
 
-        //adding context menu when clicking a Node
-        final JPopupMenu context = new JPopupMenu();
+        //adding context menu when clicking a member Node
+        final JPopupMenu memberContext = new JPopupMenu();
 
         //adding context menu for when right clicking in the void, aka a node is not where right clicked occurred
         final JPopupMenu voidContext = new JPopupMenu();
@@ -138,7 +138,7 @@ public class Testing extends JFrame {
                 undoManager.undo();
             }
         });
-        context.add(undo);
+        memberContext.add(undo);
         voidContext.add(undo);
 
         //copy and pasted above code to add Redo functionality
@@ -153,7 +153,7 @@ public class Testing extends JFrame {
                 undoManager.redo();
             }
         });
-        context.add(undo);
+        memberContext.add(undo);
         voidContext.add(undo);
 
 
@@ -216,15 +216,15 @@ public class Testing extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 mxCell obj = (mxCell) graphComponent.getCellAt(currX,currY);
-                obj.setAttribute("color","#FF0000");
+                obj.setAttribute("color","#FF05C4");
                 System.out.println(obj.getAttribute("color"));
                 obj.setStyle("red");
                 System.out.println(obj.getStyle());
-
-
             }
         });
-        context.add(menuItem);
+        memberContext.add(menuItem);
+
+        //adding the ability to add new cells to the journey through the context menu
         menuItem = new JMenuItem("Add cell");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Add Cell");
@@ -254,7 +254,7 @@ public class Testing extends JFrame {
                 graph.removeCells(var);
             }
         });
-        context.add(menuItem);
+        memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Clear All");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -292,7 +292,7 @@ public class Testing extends JFrame {
                     if(graphComponent.getCellAt(e.getX(),e.getY()) !=null) {
                         currX= e.getX();
                         currY= e.getY();
-                        context.show(e.getComponent(),e.getX(),e.getY());
+                        memberContext.show(e.getComponent(),e.getX(),e.getY());
                     }
                 }
             }
@@ -309,6 +309,32 @@ public class Testing extends JFrame {
         }
         );
 
+        //functionality to show dates
+        menuItem = new JMenuItem("Display Dates");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Display Dates");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+
+                for (DataEntry currNode:
+                     nodes) {
+                    currNode.displayDate(0);
+                }
+                int index =1;
+                for(Object target : graph.getChildVertices(graph.getDefaultParent())){
+                    ((mxCell) target).setValue(nodes.get(index).toString());
+
+                    index++;
+                }
+                graph.refresh();
+            }
+        });
+
+        voidContext.add(menuItem);
+
+
         menuItem = new JMenuItem("Show Events");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
@@ -319,7 +345,7 @@ public class Testing extends JFrame {
 
             }
         });
-        context.add(menuItem);
+        memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Partners");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -331,7 +357,7 @@ public class Testing extends JFrame {
 
             }
         });
-        context.add(menuItem);
+        memberContext.add(menuItem);
 
 
         menuItem = new JMenuItem("Show Grants");
@@ -344,7 +370,7 @@ public class Testing extends JFrame {
 
             }
         });
-        context.add(menuItem);
+        memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Products");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -356,8 +382,20 @@ public class Testing extends JFrame {
 
             }
         });
-        context.add(menuItem);
+        memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Hide Dates");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Hide Dates");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        voidContext.add(menuItem);
     }
+
     //functions that add the right nodes to the graph based on user request
     public void updateGraphEvents(mxGraph graph){
         Object parent = graph.getDefaultParent();

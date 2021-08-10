@@ -32,8 +32,10 @@ public class MemberEntry extends DataEntry{
         this.id=id;
         this.date=date;
         this.lname = lname;
-        this.display= new boolean[] {false,false};
+        this.display= new boolean[] {false};
     }
+
+
 
     public String getName() {
         return name;
@@ -108,8 +110,19 @@ public class MemberEntry extends DataEntry{
     }
 
 
+    public void displayDate(int target){
+        display[target] = true;
+    }
+    //conditional toString method that by default prints name and last name
     public String toString(){
-        return name+ " " + lname +"\n"+  date;
+        String result = name + " " + lname;
+        String[] options= {date.toString(),email,business,faculty,phone,city};
+        for (int i =0; i< display.length; i++) {
+            if(display[i]){
+                result = result+ "\n" + options[i];
+            }
+        }
+        return result;
     }
 
     public boolean equals(Object comp){
