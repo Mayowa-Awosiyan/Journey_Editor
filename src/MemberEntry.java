@@ -13,9 +13,10 @@ public class MemberEntry extends DataEntry{
     private String city;
     private boolean[] display;
 
-    public MemberEntry(String name, String lname,Date date, String id, String email, String business, String faculty, String phone, String city) {
+    public MemberEntry(String name,Date date,String id,  String lname, String email, String business, String faculty, String phone, String city) {
 
         super(name, id);
+        this.name= name;
         this.date = date;
         this.lname = lname;
         this.email = email;

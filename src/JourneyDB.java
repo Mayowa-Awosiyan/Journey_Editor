@@ -29,7 +29,12 @@ public class JourneyDB {
                 String fname= resultSet.getString(2);
                 String lname=resultSet.getString(3);
                 Date dateJ = (Date) resultSet.getDate(5);
-                MemberEntry entry = new MemberEntry(fname,dateJ,id,lname);
+                String bui = resultSet.getString(4);
+                String email = resultSet.getString("email");
+                String fac = resultSet.getString("faculty");
+                String phone = resultSet.getString("mobile_phone");
+                String city = resultSet.getString("city");
+                MemberEntry entry = new MemberEntry(fname,dateJ,id,lname,email,bui,fac,phone,city);
                 cells.add(entry);
             }
         } catch (SQLException throwables) {
