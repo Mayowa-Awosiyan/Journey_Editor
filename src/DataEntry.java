@@ -49,7 +49,24 @@ public class DataEntry extends Object {
         }
     }
 
-    public void displayDate(int target){
+
+    //placeholder functions to be overridden
+    public void toggleDate(){
+        ;
+    }
+    public void toggleBusiness(){
+        ;
+    }
+    public void toggleEmail(){
+        ;
+    }
+    public void togglePhone(){
+        ;
+    }
+    public void toggleCity(){
+        ;
+    }
+    public void toggleFaculty(){
         ;
     }
 }

@@ -32,7 +32,7 @@ public class MemberEntry extends DataEntry{
         this.id=id;
         this.date=date;
         this.lname = lname;
-        this.display= new boolean[] {false};
+        this.display= new boolean[]{false, false, false, false, false, false};
     }
 
 
@@ -110,15 +110,30 @@ public class MemberEntry extends DataEntry{
     }
 
 
-    public void displayDate(int target){
-        display[target] = true;
+    public void toggleDate(){
+        display[0] = !display[0];
     }
+
+    public void toggleEmail(){
+        display[1]= !display[1];
+    }
+
+    public void toggleBusiness(){
+        display[2] = !display[2];
+    }
+    public void toggleFaculty(){display[3] = !display[3];}
+
+    public void togglePhone(){display[4] = !display[4];}
+    public void toggleCity(){
+        display[5] = !display[5];
+    }
+
     //conditional toString method that by default prints name and last name
     public String toString(){
         String result = name + " " + lname;
         String[] options= {date.toString(),email,business,faculty,phone,city};
         for (int i =0; i< display.length; i++) {
-            if(display[i]){
+            if(display[i] && options[i]!=null){
                 result = result+ "\n" + options[i];
             }
         }

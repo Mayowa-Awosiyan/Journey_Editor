@@ -74,7 +74,6 @@ public class Testing extends JFrame {
              */
 
             //todo give a layout so it looks nice
-
             int v1 = 20;
             int v2 =50;
             Object prevCell= null;
@@ -101,8 +100,7 @@ public class Testing extends JFrame {
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         getContentPane().add(graphComponent);
 
-
-
+        //add listeners so the program can keep track of changes
         graph.getModel().addListener(mxEvent.UNDO, undoHandler);
         graph.getView().addListener(mxEvent.UNDO, undoHandler);
         undoHandler = new mxEventSource.mxIEventListener() {
@@ -111,17 +109,11 @@ public class Testing extends JFrame {
                 //undoManager.undoableEditHappened((mxUndoableEdit) mxEventObject.getProperty("edit"));
                 List<mxUndoableEdit.mxUndoableChange> changes = ((mxUndoableEdit) mxEventObject.getProperty("edit")).getChanges();
                 graph.setSelectionCells(graph.getSelectionCellsForChanges(changes));
-
-
             }
         };
 
-
         undoManager.addListener(mxEvent.UNDO, undoHandler);
         undoManager.addListener(mxEvent.REDO,undoHandler);
-
-
-
 
         //adding context menu when clicking a member Node
         final JPopupMenu memberContext = new JPopupMenu();
@@ -309,30 +301,77 @@ public class Testing extends JFrame {
         }
         );
 
-        //functionality to show dates
-        menuItem = new JMenuItem("Display Dates");
+        //functionality to show dates/phone numbers/emails/etc.
+        menuItem = new JMenuItem("Toggle Dates");
         menuItem.setMnemonic(KeyEvent.VK_P);
-        menuItem.getAccessibleContext().setAccessibleDescription("Display Dates");
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Dates");
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-
-                for (DataEntry currNode:
-                     nodes) {
-                    currNode.displayDate(0);
-                }
-                int index =1;
-                for(Object target : graph.getChildVertices(graph.getDefaultParent())){
-                    ((mxCell) target).setValue(nodes.get(index).toString());
-
-                    index++;
-                }
-                graph.refresh();
+                displayInfo(graph,0);
             }
         });
 
-        voidContext.add(menuItem);
+        memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle Emails");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Emails");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,1);
+            }
+        });
+
+        memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle Business Name");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Business Name");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,2);
+            }
+        });
+
+        memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle Faculty");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Faculty");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,3);
+            }
+        });
+
+        memberContext.add(menuItem);
+        menuItem = new JMenuItem("Toggle Phone Number");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Phone Number");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,4);
+            }
+        });
+
+        memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle City");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle City");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,5);
+            }
+        });
+
+        memberContext.add(menuItem);
 
 
         menuItem = new JMenuItem("Show Events");
@@ -379,21 +418,10 @@ public class Testing extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateGraphProducts(graph);
-
             }
         });
         memberContext.add(menuItem);
 
-        menuItem = new JMenuItem("Hide Dates");
-        menuItem.setMnemonic(KeyEvent.VK_P);
-        menuItem.getAccessibleContext().setAccessibleDescription("Hide Dates");
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        voidContext.add(menuItem);
     }
 
     //functions that add the right nodes to the graph based on user request
@@ -579,6 +607,39 @@ public class Testing extends JFrame {
         }
     }
 
+    //function to display requested info
+    public void displayInfo(mxGraph graph,int choice){
+        for (DataEntry currNode:
+                nodes) {
+            switch (choice){
+                case 0:
+                    currNode.toggleDate();
+                    break;
+                case 1:
+                    currNode.toggleEmail();
+                    break;
+                case 2:
+                    currNode.toggleBusiness();
+                    break;
+                case 3:
+                    currNode.toggleFaculty();
+                    break;
+                case 4:
+                    currNode.togglePhone();
+                    break;
+                case 5:
+                    currNode.toggleCity();
+                    break;
+            }
+        }
+        int index =1;
+        for(Object target : graph.getChildVertices(graph.getDefaultParent())){
+            ((mxCell) target).setValue(nodes.get(index).toString());
+            index++;
+        }
+        graph.refresh();
+    }
+
 
 
     //Early testing to get used to all the new functions I will be using as part of this project
@@ -591,7 +652,7 @@ public class Testing extends JFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //sets the default size of the window default 400, 320
-        frame.setSize(700, 520);
+        frame.setSize(700, 620);
         //makes the window visible
         frame.setVisible(true);
 
