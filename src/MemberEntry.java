@@ -18,6 +18,7 @@ public class MemberEntry extends DataEntry{
         super(name, id);
         this.name= name;
         this.date = date;
+        this.id=id;
         this.lname = lname;
         this.email = email;
         this.business = business;

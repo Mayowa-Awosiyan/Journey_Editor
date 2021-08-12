@@ -69,4 +69,13 @@ public class DataEntry extends Object {
     public void toggleFaculty(){
         ;
     }
+    public void toggleTheme(){
+        ;
+    }
+    public void toggleType(){
+        ;
+    }
+    public void toggleAmount(){
+        ;
+    }
 }

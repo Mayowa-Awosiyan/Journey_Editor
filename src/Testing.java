@@ -115,11 +115,16 @@ public class Testing extends JFrame {
         undoManager.addListener(mxEvent.UNDO, undoHandler);
         undoManager.addListener(mxEvent.REDO,undoHandler);
 
-        //adding context menu when clicking a member Node
+        //adding context menu when clicking a member/event/partner/etc. Node
         final JPopupMenu memberContext = new JPopupMenu();
+        final JPopupMenu eventContext = new JPopupMenu();
+        final JPopupMenu productContext = new JPopupMenu();
+        final JPopupMenu grantContext = new JPopupMenu();
+        final JPopupMenu partnerContext = new JPopupMenu();
 
         //adding context menu for when right clicking in the void, aka a node is not where right clicked occurred
         final JPopupMenu voidContext = new JPopupMenu();
+
         JMenuItem undo = new JMenuItem("Undo");
         undo.setMnemonic(KeyEvent.VK_P);
         undo.getAccessibleContext().setAccessibleDescription("Undo");
@@ -434,6 +439,7 @@ public class Testing extends JFrame {
             String targetID =thing.getId();
             //this is the id in the database
             targetID = nodes.get(label.getTarget(targetID)).getId();
+            System.out.println(targetID);
             ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_member" +
                     " where " + targetID+ " = relp_Event_member.Member_ID and main_events.id = relp_event_member.Event_id");
             try

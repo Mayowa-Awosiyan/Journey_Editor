@@ -7,6 +7,7 @@ public class EventEntry extends DataEntry{
     private Date startDate;
     private Date endDate;
     private String notes;
+    private boolean[] display;
 
 
 
@@ -16,12 +17,12 @@ public class EventEntry extends DataEntry{
 
     public EventEntry(String name, Date date, String id, String frName, int type, Date endDate, String notes) {
         super(name, id);
-
         this.startDate=date;
         this.frName = frName;
         this.type = type;
         this.endDate = endDate;
         this.notes = notes;
+        this.display = new boolean[] {false,false,false,false,false};
 
     }
 
@@ -71,7 +72,29 @@ public class EventEntry extends DataEntry{
         }
     }
 
+    public void toggleDate(){
+        display[0]= !display[0];
+    }
+    public void toggleType(){
+        display[1]=!display[1];
+    }
+
+    //todo experiment with putting this in the toggleDate function
+    public void displayEnd(){
+        display[2] =!display[2];
+    }
+    public void displayNotes(){
+        display[3] =!display[3];
+    }
+
     public String toString(){
-        return name + "\n" + startDate;
+        String result = name + "\n"+ frName;
+        String[] options= {startDate.toString(),String.valueOf(type),endDate.toString(), notes};
+        for (int i =0; i< display.length; i++) {
+            if(display[i] && options[i]!=null){
+                result = result+ "\n" + options[i];
+            }
+        }
+        return result;
     }
 }
