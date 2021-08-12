@@ -5,7 +5,6 @@ public class MemberEntry extends DataEntry{
     private String lname;
     private String name;
     private Date date;
-    private String id;
     private String email;
     private String business;
     private String faculty;
@@ -18,7 +17,6 @@ public class MemberEntry extends DataEntry{
         super(name, id);
         this.name= name;
         this.date = date;
-        this.id=id;
         this.lname = lname;
         this.email = email;
         this.business = business;
@@ -55,13 +53,6 @@ public class MemberEntry extends DataEntry{
         this.date = date;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getLname() {
         return lname;
