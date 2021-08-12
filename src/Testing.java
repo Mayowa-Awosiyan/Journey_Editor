@@ -615,8 +615,11 @@ public class Testing extends JFrame {
 
     //function to display requested info
     public void displayInfo(mxGraph graph,int choice){
+        int count = 0;
+
         for (DataEntry currNode:
                 nodes) {
+
             switch (choice){
                 case 0:
                     currNode.toggleDate();
@@ -635,12 +638,17 @@ public class Testing extends JFrame {
                     break;
                 case 5:
                     currNode.toggleCity();
+
                     break;
             }
         }
         int index =1;
         for(Object target : graph.getChildVertices(graph.getDefaultParent())){
             ((mxCell) target).setValue(nodes.get(index).toString());
+            //increase the size of the nodes when there is info added
+            count = target.toString().split("\r\n|\r|\n").length -1;
+            ((mxCell) target).getGeometry().setHeight(50 + 5*count);
+
             index++;
         }
         graph.refresh();

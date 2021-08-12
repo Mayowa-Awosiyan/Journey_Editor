@@ -87,6 +87,7 @@ public class EventEntry extends DataEntry{
         display[3] =!display[3];
     }
 
+    //by default shows both english name and french name
     public String toString(){
         String result = name + "\n"+ frName;
         String[] options= {startDate.toString(),String.valueOf(type),endDate.toString(), notes};
