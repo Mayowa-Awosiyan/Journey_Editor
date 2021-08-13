@@ -5,11 +5,13 @@ public class DataEntry extends Object {
 
     protected String name;
     protected String id;
+    protected String style;
 
 
     public DataEntry(String name, String id){
         this.name= name;
         this.id=id;
+        this.style = "ROUNDED;strokeColor=blue;fillColor=blue";
     }
 
     public String getName() {
@@ -51,6 +53,9 @@ public class DataEntry extends Object {
 
 
     //placeholder functions to be overridden
+    public String getStyle(){
+        return style;
+    }
     public void toggleDate(){
         ;
     }

@@ -5,9 +5,7 @@ public class PartnerEntry extends DataEntry{
     private int scope;
     private String notes;
     private int type;
-
-
-
+    private boolean[] display;
 
     public PartnerEntry(String name,String id) {
         super(name,id);
@@ -18,6 +16,7 @@ public class PartnerEntry extends DataEntry{
         this.scope = scope;
         this.notes = notes;
         this.type = type;
+        this.display = new boolean[] {false,false,false};
     }
 
     public int getScope() {
@@ -30,6 +29,29 @@ public class PartnerEntry extends DataEntry{
 
     public int getType() {
         return type;
+    }
+
+    public void toggleNotes(){
+        display[0] = !display[0];
+    }
+
+    public void toggleScope(){
+        display[1]= !display[1];
+    }
+
+    public void toggleType(){
+        display[2] = !display[2];
+    }
+
+    public String toString(){
+        String result = name;
+        String[] options= {notes, String.valueOf(scope), String.valueOf(type)};
+        for (int i =0; i< display.length; i++) {
+            if(display[i] && options[i]!=null){
+                result = result+ "\n" + options[i];
+            }
+        }
+        return result;
     }
 
 

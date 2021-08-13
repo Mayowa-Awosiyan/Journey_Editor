@@ -80,7 +80,8 @@ public class Testing extends JFrame {
             for (MemberEntry currentCell:
                  cells) {
                 //not having toString() causes errors that dont seem to affect the program
-                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50, "ROUNDED;strokeColor=lightblue;fillColor=lightblue");
+
                 v1+= 50;
                 v2+= 75;
                 nodes.add(currentCell);
@@ -638,7 +639,6 @@ public class Testing extends JFrame {
                     break;
                 case 5:
                     currNode.toggleCity();
-
                     break;
             }
         }
@@ -669,6 +669,10 @@ public class Testing extends JFrame {
         frame.setSize(700, 620);
         //makes the window visible
         frame.setVisible(true);
+
+        //5-6 colorblind friendly colors
+        //5-6 shapes for different types (member, event, etc.)
+        //create edge context menu to create color based paths
 
     }
 }

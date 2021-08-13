@@ -8,6 +8,7 @@ public class ProductEntry extends DataEntry{
     private String doi;
     private String notes;
     private int type;
+    private boolean[] display;
 
 
     public ProductEntry(String name, String id) {
@@ -22,6 +23,7 @@ public class ProductEntry extends DataEntry{
         this.doi = doi;
         this.notes = notes;
         this.type = type;
+        this.display = new boolean[] {false,false,false,false,false,false};
     }
 
     public Date getDate() {
@@ -48,8 +50,34 @@ public class ProductEntry extends DataEntry{
         return type;
     }
 
+    public void toggleDate(){
+        display[0] = !display[0];
+    }
+
+    public void toggleOngoing(){
+        display[1]= !display[1];
+    }
+
+    public void togglePeerReviewed(){
+        display[2] = !display[2];
+    }
+    public void toggleDoi(){display[3] = !display[3];}
+
+    public void toggleNotes(){display[4] = !display[4];}
+
+    public void toggleType(){
+        display[5] = !display[5];
+    }
+
     public String toString(){
-        return name + "\n" + date;
+        String result = name;
+        String[] options= {date.toString(),String.valueOf(ongoing),String.valueOf(peerReviewed), doi,notes, String.valueOf(type)};
+        for (int i =0; i< display.length; i++) {
+            if(display[i] && options[i]!=null){
+                result = result+ "\n" + options[i];
+            }
+        }
+        return result;
     }
 
     public boolean equals(Object comp){
