@@ -7,23 +7,26 @@ public class GrantEntry extends DataEntry{
     private int source;
     private String notes;
     private boolean[] display;
+    private Float amount;
     //todo figure what data type investigator is and implement it
     //private String investigator;
 
 
     public GrantEntry(String name, Date date, String id) {
         super(name,id);
-        this.display = new boolean[] {false,false,false, false,false};
+        this.date = date;
+        this.display = new boolean[] {false,false,false, false,false,false};
     }
 
-    public GrantEntry(String name, Date date, String id, Date recDate, Date finDate, int source,String notes) {
+    public GrantEntry(String name, Date date, String id, Date recDate, Date finDate, int source,String notes, Float amount) {
         super(name,id);
         this.date=date;
         this.recDate = recDate;
         this.finDate = finDate;
         this.source = source;
+        this.amount = amount;
         this.notes= notes;
-        this.display = new boolean[] {false,false,false, false,false};
+        this.display = new boolean[] {false,false,false, false,false,false};
     }
 
     public String getNotes() {
@@ -61,10 +64,25 @@ public class GrantEntry extends DataEntry{
 
     public void toggleNotes(){display[4] = !display[4];}
 
+    public void toggleAmount(){
+        display[5]= !display[5];
+    }
+
     public String toString(){
         String result = name;
-        String[] options= {date.toString(),recDate.toString(),finDate.toString(),String.valueOf(source),notes};
-        for (int i =0; i< display.length; i++) {
+        /* todo fail safe for incomplete data entries
+        String[] options = new String[] {null, null, null, null, null, String.valueOf(amount)};
+        if(date == null && display[5]){
+            options =
+        }
+        else if(finDate == null && display[5]){
+
+        }
+        else if(recDate == null && display[5])
+
+         */
+        String[] options= new String[]{date.toString(), recDate.toString(), finDate.toString(), String.valueOf(source), notes, String.valueOf(amount)};
+        for (int i =0; i< options.length; i++) {
             if(display[i] && options[i]!=null){
                 result = result+ "\n" + options[i];
             }

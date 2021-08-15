@@ -93,7 +93,7 @@ public class EventEntry extends DataEntry{
         String[] options= {startDate.toString(),String.valueOf(type),endDate.toString(), notes};
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){
-                result = result+ "\n" + options[i];
+                result = result + "\n" + options[i];
             }
         }
         return result;

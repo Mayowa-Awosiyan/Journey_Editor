@@ -4,12 +4,14 @@ import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.*;
 import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxStylesheet;
 
 import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
 import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import static javax.swing.SwingUtilities.isRightMouseButton;
@@ -26,7 +28,6 @@ public class Testing extends JFrame {
     private ArrayList<DataEntry> nodes;
 
     private int currLayout;
-    private String currType;
     private ArrayList<Object> cellList;
 
 
@@ -58,10 +59,40 @@ public class Testing extends JFrame {
         Object parent = graph.getDefaultParent();
 
         graph.getModel().beginUpdate();
+        //member stylesheet
+        mxStylesheet stylesheet = graph.getStylesheet();
+        Hashtable<String, Object> memberStyle = new Hashtable<String, Object>();
+        memberStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
+        memberStyle.put(mxConstants.STYLE_OPACITY, 50);
+        memberStyle.put(mxConstants.STYLE_FONTCOLOR, "#774400");
+        stylesheet.putCellStyle("Member", memberStyle);
+        //grant style sheet
+        Hashtable<String, Object> grantStyle = new Hashtable<String, Object>();
+        grantStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
+        grantStyle.put(mxConstants.STYLE_OPACITY, 50);
+        grantStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
+        grantStyle.put(mxConstants.STYLE_FILLCOLOR,"#F5793A");
+        stylesheet.putCellStyle("Grant", grantStyle);
+
+        //event style sheet
+        Hashtable<String, Object> eventStyle = new Hashtable<String, Object>();
+        eventStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
+        eventStyle.put(mxConstants.STYLE_OPACITY, 50);
+        //eventStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
+        eventStyle.put(mxConstants.STYLE_SHAPE,mxConstants.SHAPE_TRIANGLE);
+        eventStyle.put(mxConstants.STYLE_FILLCOLOR, "#A95AA1");
+        eventStyle.put(mxConstants.STYLE_STROKECOLOR,"#BA5AA1");
+        stylesheet.putCellStyle("Event", eventStyle);
+
+        Hashtable<String, Object> productStyle = new Hashtable<String, Object>();
+        productStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_CLOUD);
+        productStyle.put(mxConstants.STYLE_OPACITY, 50);
+        productStyle.put(mxConstants.STYLE_FILLCOLOR, "#0F2080");
+        stylesheet.putCellStyle("Product", productStyle);
 
         journeyDB= new JourneyDB();
         ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_members");
-        currType= "Member";
+
         try
         {
             //adding nodes and edges to the graph
@@ -80,7 +111,7 @@ public class Testing extends JFrame {
             for (MemberEntry currentCell:
                  cells) {
                 //not having toString() causes errors that dont seem to affect the program
-                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50, "ROUNDED;strokeColor=lightblue;fillColor=lightblue");
+                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
 
                 v1+= 50;
                 v2+= 75;
@@ -136,7 +167,7 @@ public class Testing extends JFrame {
                 undoManager.undo();
             }
         });
-        memberContext.add(undo);
+
         voidContext.add(undo);
 
         //copy and pasted above code to add Redo functionality
@@ -151,7 +182,7 @@ public class Testing extends JFrame {
                 undoManager.redo();
             }
         });
-        memberContext.add(undo);
+
         voidContext.add(undo);
 
 
@@ -163,42 +194,17 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(currLayout ==1){
-                    currLayout+= 1;
-                    mxFastOrganicLayout mxFastOrganicLayout = new mxFastOrganicLayout(graph);
-                    mxFastOrganicLayout.setMinDistanceLimit(20);
-                    mxFastOrganicLayout.execute(graph.getDefaultParent());
-                }
-                else if(currLayout == 2){
+                if(currLayout == 1){
                     currLayout+=1;
                     mxHierarchicalLayout mxHierarchicalLayout = new mxHierarchicalLayout(graph);
                     mxHierarchicalLayout.setFineTuning(true);
                     mxHierarchicalLayout.execute(graph.getDefaultParent());
                 }
-                else if(currLayout == 3){
-                    currLayout+=1;
-                    mxOrganicLayout mxOrganicLayout = new mxOrganicLayout(graph);
-                    mxOrganicLayout.setMinDistanceLimit(20);
-                    mxOrganicLayout.execute(graph.getDefaultParent());
-                }
-                else if(currLayout ==4){
-                    currLayout+=1;
-                    System.out.print("CIRCLE");
-                    mxCircleLayout mxCircleLayout = new mxCircleLayout(graph);
-                    mxCircleLayout.setResetEdges(true);
-                    mxCircleLayout.execute(graph.getDefaultParent());
-                }
-                else if(currLayout ==5){
-                    currLayout+=1;
+                else if(currLayout ==2){
+                    currLayout=1;
                     mxCompactTreeLayout mxCompactTreeLayout = new mxCompactTreeLayout(graph);
                     mxCompactTreeLayout.execute(graph.getDefaultParent());
                 }
-                else if(currLayout ==6){
-                    currLayout=1;
-                    mxPartitionLayout mxPartitionLayout = new mxPartitionLayout(graph);
-                    mxPartitionLayout.execute(graph.getDefaultParent());
-                }
-
             }
         });
 
@@ -462,7 +468,7 @@ public class Testing extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
                         label.progress();
@@ -479,6 +485,7 @@ public class Testing extends JFrame {
     }
 
     public void updateGraphGrants(mxGraph graph){
+
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
         for(Object addition : targets){
@@ -508,7 +515,7 @@ public class Testing extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
                         v1+= 50;
                         v2+= 75;
                         label.progress();
@@ -554,7 +561,7 @@ public class Testing extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
                         v1+= 50;
                         v2+= 75;
                         label.progress();
@@ -599,7 +606,7 @@ public class Testing extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,currType);
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"TRIANGLE;strokeColor=#000000;fillColor=grey");
                         v1+= 50;
                         v2+= 75;
                         label.progress();
@@ -660,8 +667,7 @@ public class Testing extends JFrame {
     public static void main(String[] args) throws SQLException {
 
         //todo add a dialog box to kick start the diagram (potentially always available)
-        //todo make sure nodes arent repeated
-        //todo write up email on what to add to menus
+
         Testing frame = new Testing();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

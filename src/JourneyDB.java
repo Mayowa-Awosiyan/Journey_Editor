@@ -84,7 +84,7 @@ public class JourneyDB {
                 int source = resultSet.getInt(9);
                 Date fin = resultSet.getDate(8);
 
-                GrantEntry entry = new GrantEntry(fname,dateJ,id,endDate,fin,source,notes);
+                GrantEntry entry = new GrantEntry(fname,dateJ,id,endDate,fin,source,notes, amount);
                 cells.add(entry);
             }
         } catch (SQLException throwables) {
