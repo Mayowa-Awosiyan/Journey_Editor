@@ -76,10 +76,9 @@ public class Testing extends JFrame {
 
         //event style sheet
         Hashtable<String, Object> eventStyle = new Hashtable<String, Object>();
-        eventStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
+        eventStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_HEXAGON);
         eventStyle.put(mxConstants.STYLE_OPACITY, 50);
         //eventStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
-        eventStyle.put(mxConstants.STYLE_SHAPE,mxConstants.SHAPE_TRIANGLE);
         eventStyle.put(mxConstants.STYLE_FILLCOLOR, "#A95AA1");
         eventStyle.put(mxConstants.STYLE_STROKECOLOR,"#BA5AA1");
         stylesheet.putCellStyle("Event", eventStyle);
@@ -197,12 +196,17 @@ public class Testing extends JFrame {
                 if(currLayout == 1){
                     currLayout+=1;
                     mxHierarchicalLayout mxHierarchicalLayout = new mxHierarchicalLayout(graph);
+                    //makes layout easier to follow when complexity rises
                     mxHierarchicalLayout.setFineTuning(true);
+                    mxHierarchicalLayout.setInterHierarchySpacing(40);
+                    mxHierarchicalLayout.setParallelEdgeSpacing(30);
                     mxHierarchicalLayout.execute(graph.getDefaultParent());
                 }
                 else if(currLayout ==2){
                     currLayout=1;
                     mxCompactTreeLayout mxCompactTreeLayout = new mxCompactTreeLayout(graph);
+                    mxCompactTreeLayout.setNodeDistance(30);
+                    mxCompactTreeLayout.setGroupPadding(30);
                     mxCompactTreeLayout.execute(graph.getDefaultParent());
                 }
             }
@@ -654,7 +658,7 @@ public class Testing extends JFrame {
             ((mxCell) target).setValue(nodes.get(index).toString());
             //increase the size of the nodes when there is info added
             count = target.toString().split("\r\n|\r|\n").length -1;
-            ((mxCell) target).getGeometry().setHeight(50 + 5*count);
+            ((mxCell) target).getGeometry().setHeight(50 + 7*count);
 
             index++;
         }
