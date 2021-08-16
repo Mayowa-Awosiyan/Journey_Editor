@@ -83,4 +83,17 @@ public class DataEntry extends Object {
     public void toggleAmount(){
         ;
     }
+
+    public void toggleRecDate(){;}
+
+    public void toggleFinDate(){
+        ;
+    }
+
+    public void toggleSource(){
+        ;
+    }
+    public void toggleNotes(){
+        ;
+    }
 }

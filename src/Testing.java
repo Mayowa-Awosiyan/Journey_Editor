@@ -170,7 +170,7 @@ public class Testing extends JFrame {
         voidContext.add(undo);
 
         //copy and pasted above code to add Redo functionality
-        //todo fix this
+
         undo = new JMenuItem("Redo");
         undo.setMnemonic(KeyEvent.VK_P);
         undo.getAccessibleContext().setAccessibleDescription("Redo");
@@ -184,8 +184,6 @@ public class Testing extends JFrame {
 
         voidContext.add(undo);
 
-
-        //todo add layout options
         JMenuItem menuItem = new JMenuItem("Change Layout");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Change Layout");
@@ -284,7 +282,23 @@ public class Testing extends JFrame {
                     if(graphComponent.getCellAt(e.getX(),e.getY()) !=null) {
                         currX= e.getX();
                         currY= e.getY();
-                        memberContext.show(e.getComponent(),e.getX(),e.getY());
+                        Object chosen = nodes.get(cellList.indexOf(graphComponent.getCellAt(e.getX(), e.getY()))).getClass();
+                        System.out.println(chosen);
+                        if(chosen == MemberEntry.class) {
+                            memberContext.show(e.getComponent(), e.getX(), e.getY());
+                        }
+                        else if(chosen == GrantEntry.class){
+                            grantContext.show(e.getComponent(),e.getX(),e.getY());
+                        }
+                        else if(chosen == EventEntry.class){
+                            eventContext.show(e.getComponent(),e.getX(),e.getY());
+                        }
+                        else if(chosen == PartnerEntry.class){
+                            partnerContext.show(e.getComponent(),e.getX(),e.getY());
+                        }
+                        else if(chosen == ProductEntry.class){
+                            productContext.show(e.getComponent(),e.getX(),e.getY());
+                        }
                     }
                 }
             }
@@ -311,7 +325,6 @@ public class Testing extends JFrame {
                 displayInfo(graph,0);
             }
         });
-
         memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Toggle Emails");
@@ -323,7 +336,6 @@ public class Testing extends JFrame {
                 displayInfo(graph,1);
             }
         });
-
         memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Toggle Business Name");
@@ -335,7 +347,6 @@ public class Testing extends JFrame {
                 displayInfo(graph,2);
             }
         });
-
         memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Toggle Faculty");
@@ -370,9 +381,40 @@ public class Testing extends JFrame {
                 displayInfo(graph,5);
             }
         });
-
         memberContext.add(menuItem);
 
+        menuItem = new JMenuItem("Toggle Amount");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Amount");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,6);
+            }
+        });
+        grantContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle Received Date");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Received Date");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,7);
+            }
+        });
+        grantContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle Finish Date");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Finish Date");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,8);
+            }
+        });
+        grantContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Events");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -634,6 +676,15 @@ public class Testing extends JFrame {
                     break;
                 case 5:
                     currNode.toggleCity();
+                    break;
+                case 6:
+                    currNode.toggleAmount();
+                    break;
+                case 7:
+                    currNode.toggleRecDate();
+                    break;
+                case 8:
+                    currNode.toggleFinDate();
                     break;
             }
         }
