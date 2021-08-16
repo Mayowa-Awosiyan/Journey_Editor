@@ -215,22 +215,6 @@ public class Testing extends JFrame {
         voidContext.add(menuItem);
 
         //adding color changing option to context menu
-        //Todo: make it actually change color
-        menuItem = new JMenuItem("Change Color");
-        menuItem.setMnemonic(KeyEvent.VK_P);
-        menuItem.getAccessibleContext().setAccessibleDescription("Change Color");
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                mxCell obj = (mxCell) graphComponent.getCellAt(currX,currY);
-                obj.setAttribute("color","#FF05C4");
-                System.out.println(obj.getAttribute("color"));
-                obj.setStyle("red");
-                System.out.println(obj.getStyle());
-            }
-        });
-        memberContext.add(menuItem);
 
         //adding the ability to add new cells to the journey through the context menu
         menuItem = new JMenuItem("Add cell");
