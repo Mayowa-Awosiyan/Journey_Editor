@@ -1,14 +1,48 @@
+/*
+Copyright (c) 2001-2014, JGraph Ltd
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the JGraph nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL JGRAPH BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+© 2021 GitHub, Inc.
+
+ */
+
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.layout.*;
+import com.mxgraph.layout.mxCompactTreeLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.*;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxStylesheet;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
+import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -64,11 +98,12 @@ public class Testing extends JFrame {
         Hashtable<String, Object> memberStyle = new Hashtable<String, Object>();
         memberStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
         memberStyle.put(mxConstants.STYLE_OPACITY, 50);
-        memberStyle.put(mxConstants.STYLE_FONTCOLOR, "#774400");
+        memberStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
         stylesheet.putCellStyle("Member", memberStyle);
         //grant style sheet
         Hashtable<String, Object> grantStyle = new Hashtable<String, Object>();
         grantStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
+
         grantStyle.put(mxConstants.STYLE_OPACITY, 50);
         grantStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
         grantStyle.put(mxConstants.STYLE_FILLCOLOR,"#F5793A");
@@ -78,7 +113,7 @@ public class Testing extends JFrame {
         Hashtable<String, Object> eventStyle = new Hashtable<String, Object>();
         eventStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_HEXAGON);
         eventStyle.put(mxConstants.STYLE_OPACITY, 50);
-        //eventStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
+        eventStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
         eventStyle.put(mxConstants.STYLE_FILLCOLOR, "#A95AA1");
         eventStyle.put(mxConstants.STYLE_STROKECOLOR,"#BA5AA1");
         stylesheet.putCellStyle("Event", eventStyle);
@@ -86,6 +121,7 @@ public class Testing extends JFrame {
         Hashtable<String, Object> productStyle = new Hashtable<String, Object>();
         productStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_CLOUD);
         productStyle.put(mxConstants.STYLE_OPACITY, 50);
+        productStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
         productStyle.put(mxConstants.STYLE_FILLCOLOR, "#0F2080");
         stylesheet.putCellStyle("Product", productStyle);
 
@@ -223,7 +259,7 @@ public class Testing extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //todo change the position a bit so it goes where expected
                 Object cell = graph.insertVertex(parent, label.toString(), "",getMousePosition().getX(),
-                        getMousePosition().getY(),120, 50);
+                        getMousePosition().getY(),120, 50,custom);
                 label.progress();
                 //todo make this take in the data added to the cell/create class custom Entry
                 nodes.add(new DataEntry(null,null));
@@ -283,7 +319,6 @@ public class Testing extends JFrame {
                         currX= e.getX();
                         currY= e.getY();
                         Object chosen = nodes.get(cellList.indexOf(graphComponent.getCellAt(e.getX(), e.getY()))).getClass();
-                        System.out.println(chosen);
                         if(chosen == MemberEntry.class) {
                             memberContext.show(e.getComponent(), e.getX(), e.getY());
                         }
@@ -316,6 +351,7 @@ public class Testing extends JFrame {
         );
 
         //functionality to show dates/phone numbers/emails/etc.
+        //todo add keyboard shortcuts
         menuItem = new JMenuItem("Toggle Dates");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Toggle Dates");
@@ -463,6 +499,24 @@ public class Testing extends JFrame {
             }
         });
         memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Export Image");
+        menuItem.setMnemonic(KeyEvent.VK_S);
+        menuItem.getAccessibleContext().setAccessibleDescription("Export Image");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BufferedImage image = mxCellRenderer.createBufferedImage(graph, null, 1, Color.WHITE, true, null);
+                try {
+                    //todo add save dialog box
+                    ImageIO.write(image, "PNG", new File("C:\\temp\\graph.png"));
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            }
+        });
+
+        voidContext.add(menuItem);
 
     }
 
@@ -719,5 +773,8 @@ public class Testing extends JFrame {
         //5-6 shapes for different types (member, event, etc.)
         //create edge context menu to create color based paths
 
+        //look into serialization for saving/exporting/loading
+        //look into JSON for saving/loading graphs as well
+        //text based beats binary based
     }
 }
