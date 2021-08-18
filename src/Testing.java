@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+import com.mxgraph.examples.PdfExport;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.layout.mxCompactTreeLayout;
 import com.mxgraph.model.mxCell;
@@ -124,6 +125,14 @@ public class Testing extends JFrame {
         productStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
         productStyle.put(mxConstants.STYLE_FILLCOLOR, "#0F2080");
         stylesheet.putCellStyle("Product", productStyle);
+
+        Hashtable<String, Object> customStyle = new Hashtable<String, Object>();
+        customStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
+        customStyle.put(mxConstants.STYLE_OPACITY, 50);
+        customStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
+        customStyle.put(mxConstants.STYLE_FILLCOLOR, "#FFFF00");
+        customStyle.put(mxConstants.STYLE_STROKECOLOR, "FFFF00");
+        stylesheet.putCellStyle("Custom", customStyle);
 
         journeyDB= new JourneyDB();
         ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_members");
@@ -259,7 +268,7 @@ public class Testing extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //todo change the position a bit so it goes where expected
                 Object cell = graph.insertVertex(parent, label.toString(), "",getMousePosition().getX(),
-                        getMousePosition().getY(),120, 50,custom);
+                        getMousePosition().getY(),120, 50,"Custom");
                 label.progress();
                 //todo make this take in the data added to the cell/create class custom Entry
                 nodes.add(new DataEntry(null,null));
@@ -458,11 +467,24 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateGraphEvents(graph);
+                updateGraphEvents(graph,"Member");
 
             }
         });
         memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Events");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphEvents(graph,"Grant");
+
+            }
+        });
+        grantContext.add(menuItem);
+
 
         menuItem = new JMenuItem("Show Partners");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -501,7 +523,7 @@ public class Testing extends JFrame {
         memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Export Image");
-        menuItem.setMnemonic(KeyEvent.VK_S);
+        menuItem.setMnemonic(KeyEvent.VK_E);
         menuItem.getAccessibleContext().setAccessibleDescription("Export Image");
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -518,21 +540,56 @@ public class Testing extends JFrame {
 
         voidContext.add(menuItem);
 
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save as");
+
+        menuItem = new JMenuItem("Save File");
+        menuItem.setMnemonic(KeyEvent.VK_S);
+        menuItem.getAccessibleContext().setAccessibleDescription("Save File");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //todo make the save file usable
+                int userSelection = fileChooser.showSaveDialog(graphComponent);
+                File fileToSave = fileChooser.getSelectedFile();
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    if(String.valueOf(fileToSave).contains(".pdf")){
+
+                        try {
+                            PdfExport pdfExport = new PdfExport(graph,fileToSave);
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+                    else{
+                        try {
+                            PdfExport pdfExport = new PdfExport(graph,new File(fileToSave + ".pdf"));
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        voidContext.add(menuItem);
+
     }
 
     //functions that add the right nodes to the graph based on user request
-    public void updateGraphEvents(mxGraph graph){
+    public void updateGraphEvents(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
+
         for(Object addition : targets){
             mxCell thing = (mxCell) addition;
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
             targetID = nodes.get(label.getTarget(targetID)).getId();
-            System.out.println(targetID);
-            ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_member" +
-                    " where " + targetID+ " = relp_Event_member.Member_ID and main_events.id = relp_event_member.Event_id");
+
+            ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_" +role+
+                    " where " + targetID+ " = relp_Event_"+ role +"."+role+"_ID and main_events.id = relp_event_"+ role+".Event_id");
             try
             {
                 int v1 = 200;
@@ -768,6 +825,7 @@ public class Testing extends JFrame {
         frame.setSize(700, 620);
         //makes the window visible
         frame.setVisible(true);
+
 
         //5-6 colorblind friendly colors
         //5-6 shapes for different types (member, event, etc.)
