@@ -90,7 +90,7 @@ public class EventEntry extends DataEntry{
     //by default shows both english name and french name
     public String toString(){
         String result = name + "\n"+ frName;
-        String[] options= {startDate.toString(),String.valueOf(type),endDate.toString(), notes};
+        String[] options= {"S: "+ startDate.toString(),String.valueOf(type),"E: "+endDate.toString(), notes};
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){
                 result = result + "\n" + options[i];

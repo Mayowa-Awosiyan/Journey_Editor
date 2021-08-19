@@ -27,10 +27,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-import com.mxgraph.examples.PdfExport;
+import com.mxgraph.io.mxCodec;
+import com.mxgraph.io.mxCodecRegistry;
+import com.mxgraph.io.mxGdCodec;
+import com.mxgraph.io.mxModelCodec;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.layout.mxCompactTreeLayout;
 import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.*;
 import com.mxgraph.view.mxGraph;
@@ -38,11 +42,13 @@ import com.mxgraph.view.mxStylesheet;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.undo.UndoableEdit;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -372,6 +378,8 @@ public class Testing extends JFrame {
         });
         memberContext.add(menuItem);
 
+
+
         menuItem = new JMenuItem("Toggle Emails");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Toggle Emails");
@@ -473,6 +481,18 @@ public class Testing extends JFrame {
         });
         memberContext.add(menuItem);
 
+        menuItem = new JMenuItem("Show Dates");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Dates");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,0);
+
+            }
+        });
+        eventContext.add(menuItem);
+
         menuItem = new JMenuItem("Show Events");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
@@ -522,6 +542,17 @@ public class Testing extends JFrame {
         });
         memberContext.add(menuItem);
 
+        menuItem = new JMenuItem("Save Graph");
+        menuItem.setMnemonic(KeyEvent.VK_Z);
+        menuItem.getAccessibleContext().setAccessibleDescription("Save Graph");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               ;
+            }
+        });
+        memberContext.add(menuItem);
+
         menuItem = new JMenuItem("Export Image");
         menuItem.setMnemonic(KeyEvent.VK_E);
         menuItem.getAccessibleContext().setAccessibleDescription("Export Image");
@@ -540,7 +571,7 @@ public class Testing extends JFrame {
 
         voidContext.add(menuItem);
 
-        JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         fileChooser.setDialogTitle("Save as");
 
         menuItem = new JMenuItem("Save File");
@@ -553,6 +584,7 @@ public class Testing extends JFrame {
                 int userSelection = fileChooser.showSaveDialog(graphComponent);
                 File fileToSave = fileChooser.getSelectedFile();
                 if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    /*
                     if(String.valueOf(fileToSave).contains(".pdf")){
 
                         try {
@@ -568,11 +600,63 @@ public class Testing extends JFrame {
                             exception.printStackTrace();
                         }
                     }
+
+                     */
+
+                    String filename=fileToSave.getAbsolutePath().toString();
+                    mxCodecRegistry.register(new mxModelCodec( new mxGraphModel()));
+                    try {
+
+                        mxGraph graph = graphComponent.getGraph();
+
+                        // taken from EditorActions class
+                        mxCodec codec = new mxCodec();
+                        String xml = mxXmlUtils.getXml(codec.encode(graph.getModel()));
+                        mxUtils.writeFile(xml,filename );
+
+                        JOptionPane.showMessageDialog( graphComponent, "File saved to: " + filename);
+
+                    } catch( Exception ex) {
+                        throw new RuntimeException( ex);
+                    }
                 }
             }
         });
 
         voidContext.add(menuItem);
+
+        menuItem = new JMenuItem("Load Graph");
+        menuItem.getAccessibleContext().setAccessibleDescription("Load Graph");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                JFileChooser jFileChooser= new JFileChooser();
+                int returnValue = jFileChooser.showOpenDialog(null);
+                // int returnValue = jfc.showSaveDialog(null);
+
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = jFileChooser.getSelectedFile();
+                    FileReader fileReader = null;
+                    try {
+                        graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
+                        fileReader = new FileReader(selectedFile);
+                        int something = fileReader.read();
+                        while (something != -1){
+                            mxGdCodec.decode(String.valueOf(fileReader),graph);
+                            something=fileReader.read();
+                        }
+                        graph.refresh();
+
+                    } catch (IOException fileNotFoundException) {
+                        fileNotFoundException.printStackTrace();
+                    }
+
+                }
+            }
+        });
+        voidContext.add(menuItem);
+
 
     }
 

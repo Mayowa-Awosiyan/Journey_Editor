@@ -81,7 +81,7 @@ public class GrantEntry extends DataEntry{
         else if(recDate == null && display[5])
 
          */
-        String[] options= new String[]{date.toString(), recDate.toString(), finDate.toString(), String.valueOf(source), notes, String.valueOf(amount)};
+        String[] options= new String[]{date.toString(), "Recieved: "+recDate.toString(), "Finish: "+finDate.toString(), String.valueOf(source), notes, String.valueOf(amount)};
         for (int i =0; i< options.length; i++) {
             if(display[i] && options[i]!=null){
                 result = result+ "\n" + options[i];
