@@ -83,6 +83,9 @@ public class DataEntry extends Object {
     public void toggleAmount(){
         ;
     }
+    public void setContent(String content){
+        ;
+    }
 
     public void toggleRecDate(){;}
 

@@ -48,7 +48,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -66,6 +67,7 @@ public class Testing extends JFrame {
     private int currX,currY;
     //variable to hold the id of all Data Entries will be very important todo implement this fully with an arraylist that uses id as an index
     private ProgressingLabel label;
+    private int customs;
     private ArrayList<DataEntry> nodes;
 
     private int currLayout;
@@ -87,6 +89,7 @@ public class Testing extends JFrame {
         //setting the title of the window getting opened by the program
         super("The new goal");
         currLayout= 1;
+        customs= 1;
         final mxGraph graph = new mxGraph();
         //create undo manager built in way to manage undo and redo operations
         undoManager = new mxUndoManager();
@@ -137,7 +140,7 @@ public class Testing extends JFrame {
         customStyle.put(mxConstants.STYLE_OPACITY, 50);
         customStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
         customStyle.put(mxConstants.STYLE_FILLCOLOR, "#FFFF00");
-        customStyle.put(mxConstants.STYLE_STROKECOLOR, "FFFF00");
+        customStyle.put(mxConstants.STYLE_STROKECOLOR, "#FFFF00");
         stylesheet.putCellStyle("Custom", customStyle);
 
         journeyDB= new JourneyDB();
@@ -276,8 +279,9 @@ public class Testing extends JFrame {
                 Object cell = graph.insertVertex(parent, label.toString(), "",getMousePosition().getX(),
                         getMousePosition().getY(),120, 50,"Custom");
                 label.progress();
-                //todo make this take in the data added to the cell/create class custom Entry
-                nodes.add(new DataEntry(null,null));
+                //todo make this take in the fact that content of added cell might change
+                nodes.add(new CustomEntry(null,String.valueOf(customs), ""));
+                customs++;
                 cellList.add(cell);
             }
         });
@@ -525,11 +529,23 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateGraphGrants(graph);
+                updateGraphGrants(graph, "Member");
 
             }
         });
         memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Grants");
+        menuItem.setMnemonic(KeyEvent.VK_G);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Grants");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphGrants(graph, "Event");
+
+            }
+        });
+        eventContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Products");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -637,21 +653,20 @@ public class Testing extends JFrame {
 
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = jFileChooser.getSelectedFile();
-                    FileReader fileReader = null;
                     try {
-                        graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
-                        fileReader = new FileReader(selectedFile);
-                        int something = fileReader.read();
-                        while (something != -1){
-                            mxGdCodec.decode(String.valueOf(fileReader),graph);
-                            something=fileReader.read();
+                        byte c;
+                        FileInputStream fileInputStream = new FileInputStream(selectedFile);
+                        while((c = (byte) fileInputStream.read()) != -1){
+                            mxGdCodec.decode(String.valueOf(c),graph);
+                            System.out.println(c);
                         }
-                        graph.refresh();
-
-                    } catch (IOException fileNotFoundException) {
+                    } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
                     }
 
+                    graph.refresh();
                 }
             }
         });
@@ -683,6 +698,7 @@ public class Testing extends JFrame {
                         cells) {
 
                     if(nodes.contains(currentCell)){
+
                         int target =nodes.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
@@ -709,7 +725,7 @@ public class Testing extends JFrame {
         }
     }
 
-    public void updateGraphGrants(mxGraph graph){
+    public void updateGraphGrants(mxGraph graph, String role){
 
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
@@ -719,8 +735,17 @@ public class Testing extends JFrame {
             String targetID =thing.getId();
             //this is the id in the database
             targetID = nodes.get(label.getTarget(targetID)).getId();
-            ArrayList<GrantEntry> cells = journeyDB.getGrants("Select * From main_grants, relp_grant_member" +
-                    " where " + targetID+ " = relp_grant_member.Member_ID and main_grants.id = relp_grant_member.grant_id");
+
+            ArrayList<GrantEntry> cells;
+            if(role.toLowerCase().equals("Event")){
+               cells = journeyDB.getGrants("Select * From main_grants, relp_Event_Grant"+
+                        " where " + targetID+ " = relp_grant_"+role+"."+role+"_ID and main_grants.id = relp_grant_"+role+".grant_id");
+            }
+            else{
+                cells = journeyDB.getGrants("Select * From main_grants, relp_grant_" + role+
+                        " where " + targetID+ " = relp_grant_"+role+"."+role+"_ID and main_grants.id = relp_grant_"+role+".grant_id");
+            }
+
             try
             {
                 int v1 = 200;
@@ -885,7 +910,13 @@ public class Testing extends JFrame {
         }
         int index =1;
         for(Object target : graph.getChildVertices(graph.getDefaultParent())){
+            //prevents the contents of custom nodes from being deleted
+            if(((mxCell) target).getStyle().equals("Custom")){
+                int pointer = cellList.indexOf(target);
+                nodes.get(pointer).setContent(String.valueOf(((mxCell) target).getValue()));
+            }
             ((mxCell) target).setValue(nodes.get(index).toString());
+
             //increase the size of the nodes when there is info added
             count = target.toString().split("\r\n|\r|\n").length -1;
             ((mxCell) target).getGeometry().setHeight(50 + 7*count);
