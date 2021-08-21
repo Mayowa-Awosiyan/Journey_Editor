@@ -275,11 +275,11 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //todo change the position a bit so it goes where expected
-                Object cell = graph.insertVertex(parent, label.toString(), "",getMousePosition().getX(),
-                        getMousePosition().getY(),120, 50,"Custom");
+
+                Object cell = graph.insertVertex(parent, label.toString(), "", getMousePosition(true).getX(),
+                        getMousePosition(true).getY(),120, 50,"Custom");
                 label.progress();
-                //todo make this take in the fact that content of added cell might change
+
                 nodes.add(new CustomEntry(null,String.valueOf(customs), ""));
                 customs++;
                 cellList.add(cell);
@@ -917,7 +917,7 @@ public class Testing extends JFrame {
             }
             ((mxCell) target).setValue(nodes.get(index).toString());
 
-            //increase the size of the nodes when there is info added
+            //change the size of cells based off of how many lines
             count = target.toString().split("\r\n|\r|\n").length -1;
             ((mxCell) target).getGeometry().setHeight(50 + 7*count);
 
