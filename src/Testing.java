@@ -65,13 +65,18 @@ public class Testing extends JFrame {
     List<UndoableEdit> changes;
     //these 2 integer values help keep track of the currently selected cell for deleting purposes
     private int currX,currY;
-    //variable to hold the id of all Data Entries will be very important todo implement this fully with an arraylist that uses id as an index
+    //variable to hold the id of all Data Entries will be very important
     private ProgressingLabel label;
     private int customs;
     private ArrayList<DataEntry> nodes;
 
     private int currLayout;
     private ArrayList<Object> cellList;
+    private ArrayList<MemberEntry> journeyDBmembers;
+    private ArrayList<GrantEntry> dBgrants;
+    private ArrayList<EventEntry> eventsDB;
+    private ArrayList<PartnerEntry> partnerDB;
+    private ArrayList<ProductEntry> productDB;
 
 
     JourneyDB journeyDB;
@@ -103,6 +108,7 @@ public class Testing extends JFrame {
         Object parent = graph.getDefaultParent();
 
         graph.getModel().beginUpdate();
+        //Stylesheets that give nodes representing different data types different appearances
         //member stylesheet
         mxStylesheet stylesheet = graph.getStylesheet();
         Hashtable<String, Object> memberStyle = new Hashtable<String, Object>();
@@ -113,7 +119,6 @@ public class Testing extends JFrame {
         //grant style sheet
         Hashtable<String, Object> grantStyle = new Hashtable<String, Object>();
         grantStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
-
         grantStyle.put(mxConstants.STYLE_OPACITY, 50);
         grantStyle.put(mxConstants.STYLE_FONTCOLOR, "#000000");
         grantStyle.put(mxConstants.STYLE_FILLCOLOR,"#F5793A");
@@ -144,25 +149,20 @@ public class Testing extends JFrame {
         stylesheet.putCellStyle("Custom", customStyle);
 
         journeyDB= new JourneyDB();
-        ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_members");
+        journeyDBmembers = journeyDB.getMembers("Select * From main_members");
+        dBgrants = journeyDB.getGrants("select * from main_grants");
+        eventsDB = journeyDB.getEvents("select * from main_events");
+        partnerDB = journeyDB.getPartners("select * from main_partners");
+        productDB = journeyDB.getProducts("Select * from main_products");
 
         try
         {
-            //adding nodes and edges to the graph
-            /*
-            Object v1 = graph.insertVertex(parent, null, "Hello", 20, 20, 80,
-                    30);
-            Object v2 = graph.insertVertex(parent, null, "World!",
-                    240, 150, 80, 30);
-            graph.insertEdge(parent, null, "Edge", v1, v2);
-             */
-
             //todo give a layout so it looks nice
             int v1 = 20;
             int v2 =50;
             Object prevCell= null;
             for (MemberEntry currentCell:
-                 cells) {
+                 journeyDBmembers) {
                 //not having toString() causes errors that dont seem to affect the program
                 Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
 
@@ -211,7 +211,7 @@ public class Testing extends JFrame {
         final JPopupMenu voidContext = new JPopupMenu();
 
         JMenuItem undo = new JMenuItem("Undo");
-        undo.setMnemonic(KeyEvent.VK_P);
+        undo.setMnemonic(KeyEvent.VK_Z);
         undo.getAccessibleContext().setAccessibleDescription("Undo");
         //adding an action to the undo button
         undo.addActionListener(new ActionListener() {
@@ -226,7 +226,7 @@ public class Testing extends JFrame {
         //copy and pasted above code to add Redo functionality
 
         undo = new JMenuItem("Redo");
-        undo.setMnemonic(KeyEvent.VK_P);
+        undo.setMnemonic(KeyEvent.VK_R);
         undo.getAccessibleContext().setAccessibleDescription("Redo");
         //adding an action to the undo button
         undo.addActionListener(new ActionListener() {
@@ -265,8 +265,6 @@ public class Testing extends JFrame {
         });
 
         voidContext.add(menuItem);
-
-        //adding color changing option to context menu
 
         //adding the ability to add new cells to the journey through the context menu
         menuItem = new JMenuItem("Add cell");
@@ -312,6 +310,8 @@ public class Testing extends JFrame {
         });
         voidContext.add(menuItem);
 
+
+
         //adding reactions to certain clicks
         graphComponent.getGraphControl().addMouseListener(new MouseListener() {
             @Override
@@ -331,10 +331,9 @@ public class Testing extends JFrame {
                     //displays the context menu where the user clicked
                     //todo: make completely separate popup menu for right clicking a cell
                     if(graphComponent.getCellAt(e.getX(),e.getY()) == null){
-
                         voidContext.show(e.getComponent(),e.getX(),e.getY());
                     }
-                    if(graphComponent.getCellAt(e.getX(),e.getY()) !=null) {
+                    else if(graphComponent.getCellAt(e.getX(),e.getY()) !=null) {
                         currX= e.getX();
                         currY= e.getY();
                         Object chosen = nodes.get(cellList.indexOf(graphComponent.getCellAt(e.getX(), e.getY()))).getClass();
@@ -385,7 +384,7 @@ public class Testing extends JFrame {
 
 
         menuItem = new JMenuItem("Toggle Emails");
-        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.setMnemonic(KeyEvent.VK_E);
         menuItem.getAccessibleContext().setAccessibleDescription("Toggle Emails");
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -396,7 +395,7 @@ public class Testing extends JFrame {
         memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Toggle Business Name");
-        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.setMnemonic(KeyEvent.VK_B);
         menuItem.getAccessibleContext().setAccessibleDescription("Toggle Business Name");
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -509,6 +508,40 @@ public class Testing extends JFrame {
         });
         grantContext.add(menuItem);
 
+        menuItem = new JMenuItem("Show Grant Origin");
+        menuItem.setMnemonic(KeyEvent.VK_O);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Grant Source");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,9);
+            }
+        });
+        grantContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Grant Status");
+        menuItem.setMnemonic(KeyEvent.VK_S);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Grant Status");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,10);
+            }
+        });
+        grantContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show If Connected to LRI");
+        menuItem.setMnemonic(KeyEvent.VK_S);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Grant Source");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,11);
+            }
+        });
+        grantContext.add(menuItem);
+
+
 
         menuItem = new JMenuItem("Show Partners");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -516,7 +549,7 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateGraphPartners(graph);
+                updateGraphPartners(graph, "Member");
 
             }
         });
@@ -542,10 +575,33 @@ public class Testing extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateGraphGrants(graph, "Event");
-
             }
         });
         eventContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Members");
+        menuItem.setMnemonic(KeyEvent.VK_M);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Members");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphMembers(graph, "Event");
+            }
+        });
+        eventContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Members");
+        menuItem.setMnemonic(KeyEvent.VK_M);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Members");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphMembers(graph, "Grant");
+            }
+        });
+        grantContext.add(menuItem);
+
+
 
         menuItem = new JMenuItem("Show Products");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -553,7 +609,7 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateGraphProducts(graph);
+                updateGraphProducts(graph,"Member");
             }
         });
         memberContext.add(menuItem);
@@ -681,6 +737,9 @@ public class Testing extends JFrame {
         Object[] targets = graph.getSelectionCells();
 
         for(Object addition : targets){
+            if(((mxCell) addition).isEdge()){
+                continue;
+            }
             mxCell thing = (mxCell) addition;
             //this is the id of the node
             String targetID =thing.getId();
@@ -730,6 +789,9 @@ public class Testing extends JFrame {
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
         for(Object addition : targets){
+            if(((mxCell) addition).isEdge()){
+                continue;
+            }
             mxCell thing = (mxCell) addition;
             //this is the id of the node
             String targetID =thing.getId();
@@ -737,9 +799,10 @@ public class Testing extends JFrame {
             targetID = nodes.get(label.getTarget(targetID)).getId();
 
             ArrayList<GrantEntry> cells;
-            if(role.toLowerCase().equals("Event")){
+            System.out.println(role.compareTo("Event"));
+            if(role.compareTo("Event") == 0){
                cells = journeyDB.getGrants("Select * From main_grants, relp_Event_Grant"+
-                        " where " + targetID+ " = relp_grant_"+role+"."+role+"_ID and main_grants.id = relp_grant_"+role+".grant_id");
+                        " where " + targetID+ " = relp_Event_Grant.Event_ID and main_grants.id = relp_Event_Grant.grant_id");
             }
             else{
                 cells = journeyDB.getGrants("Select * From main_grants, relp_grant_" + role+
@@ -781,17 +844,27 @@ public class Testing extends JFrame {
         }
     }
 
-    public void updateGraphProducts(mxGraph graph){
+    public void updateGraphProducts(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
         for(Object addition : targets){
+            if(((mxCell) addition).isEdge()){
+                continue;
+            }
             mxCell thing = (mxCell) addition;
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
+            ArrayList<ProductEntry> cells;
             targetID = nodes.get(label.getTarget(targetID)).getId();
-            ArrayList<ProductEntry> cells = journeyDB.getProducts("Select * From main_Products, relp_Product_member" +
-                    " where " + targetID+ " = relp_product_member.Member_ID and main_products.id = relp_product_member.product_id");
+            if(role.compareTo("Event") == 0){
+               cells = journeyDB.getProducts("Select * From main_products, relp_Event_product"+
+                        " where " + targetID+ " = relp_Event_product.Event_ID and main_products.id = relp_Event_product.product_id");
+            }
+            else{
+                cells= journeyDB.getProducts("Select * From main_Products, relp_Product_"+role +
+                        " where " + targetID+ " = relp_product_"+role+"."+role+"_ID and main_products.id = relp_product_"+role+".product_id");
+            }
             try
             {
                 int v1 = 200;
@@ -826,7 +899,7 @@ public class Testing extends JFrame {
         }
     }
 
-    public void updateGraphPartners(mxGraph graph){
+    public void updateGraphPartners(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
         for(Object addition : targets){
@@ -835,8 +908,15 @@ public class Testing extends JFrame {
             String targetID =thing.getId();
             //this is the id in the database
             targetID = nodes.get(label.getTarget(targetID)).getId();
-            ArrayList<PartnerEntry> cells = journeyDB.getPartners("Select * From main_Partners, relp_Partner_member" +
-                    " where " + targetID+ " = relp_partner_member.Member_ID and main_partners.id = relp_partner_member.partner_id");
+            ArrayList<PartnerEntry> cells;
+            if(role.compareTo("Member") == 0){
+                cells = journeyDB.getPartners("Select * From main_partner, relp_Partner_member"+
+                        " where " + targetID+ " = relp_Partner_Member.member.ID and main_partners.id = relp_partner_member.partner_id");
+            }
+            else{
+                cells = journeyDB.getPartners("Select * From main_Partners, relp_"+role+"_Partner" +
+                        " where " + targetID+ " = relp_"+role+"_partner."+ role +"_id and main_partners.id = relp_"+role+"_partner.partner_id");
+            }
             try
             {
                 int v1 = 200;
@@ -869,6 +949,58 @@ public class Testing extends JFrame {
                 exception.printStackTrace();
             }
         }
+    }
+
+    public void updateGraphMembers(mxGraph graph, String role){
+        Object parent = graph.getDefaultParent();
+        Object[] targets = graph.getSelectionCells();
+
+        for(Object addition : targets){
+            if(((mxCell) addition).isEdge()){
+                continue;
+            }
+            mxCell thing = (mxCell) addition;
+            //this is the id of the node
+            String targetID =thing.getId();
+            //this is the id in the database
+            targetID = nodes.get(label.getTarget(targetID)).getId();
+
+            ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_members, relp_"+role+"_member " +
+                    "where " + targetID+ " = relp_"+role+"_member."+role+"_ID and main_members.id = relp_"+ role+"_member.Member_id");
+            try
+            {
+                int v1 = 200;
+                int v2 =50;
+
+                for (MemberEntry currentCell:
+                        cells) {
+
+                    if(nodes.contains(currentCell)){
+
+                        int target =nodes.indexOf(currentCell);
+                        //wont create new edges that are identical to existing ones
+                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
+                            ;
+                        }
+                        else {
+                            graph.insertEdge(parent,null,"",cellList.get(target),addition);
+                        }
+                    }
+                    else {
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
+                        v1+= 50;
+                        v2+= 75;
+                        label.progress();
+                        nodes.add(currentCell);
+                        cellList.add(cell);
+                        graph.insertEdge(parent,null, "",cell,addition);
+                    }
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+
     }
 
     //function to display requested info
@@ -906,6 +1038,15 @@ public class Testing extends JFrame {
                 case 8:
                     currNode.toggleFinDate();
                     break;
+                case 9:
+                    currNode.toggleSource();
+                    break;
+                case 10:
+                    currNode.toggleStatus();
+                    break;
+                case 11:
+                    currNode.toggleLRI();
+                    break;
             }
         }
         int index =1;
@@ -924,6 +1065,10 @@ public class Testing extends JFrame {
             index++;
         }
         graph.refresh();
+    }
+
+    public void findNodes(){
+
     }
 
 

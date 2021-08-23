@@ -8,6 +8,8 @@ public class GrantEntry extends DataEntry{
     private String notes;
     private boolean[] display;
     private Float amount;
+    private boolean lri;
+    private String status;
     //todo figure what data type investigator is and implement it
     //private String investigator;
 
@@ -15,10 +17,10 @@ public class GrantEntry extends DataEntry{
     public GrantEntry(String name, Date date, String id) {
         super(name,id);
         this.date = date;
-        this.display = new boolean[] {false,false,false, false,false,false};
+        this.display = new boolean[] {false,false,false, false,false,false, false,false};
     }
 
-    public GrantEntry(String name, Date date, String id, Date recDate, Date finDate, int source,String notes, Float amount) {
+    public GrantEntry(String name, Date date, String id, Date recDate, Date finDate, int source,String notes, Float amount, boolean lri, String status) {
         super(name,id);
         this.date=date;
         this.recDate = recDate;
@@ -26,7 +28,9 @@ public class GrantEntry extends DataEntry{
         this.source = source;
         this.amount = amount;
         this.notes= notes;
-        this.display = new boolean[] {false,false,false, false,false,false};
+        this.lri = lri;
+        this.status = status;
+        this.display = new boolean[] {false,false,false, false,false,false, false,false};
     }
 
     public String getNotes() {
@@ -68,6 +72,13 @@ public class GrantEntry extends DataEntry{
         display[5]= !display[5];
     }
 
+    public void toggleLRI(){
+        display[6] =!display[6];
+    }
+    public void toggleStatus(){
+        display[7]= !display[7];
+    }
+
     public String toString(){
         String result = name;
         /* todo fail safe for incomplete data entries
@@ -81,7 +92,7 @@ public class GrantEntry extends DataEntry{
         else if(recDate == null && display[5])
 
          */
-        String[] options= new String[]{date.toString(), "Recieved: "+recDate.toString(), "Finish: "+finDate.toString(), String.valueOf(source), notes, String.valueOf(amount)};
+        String[] options= new String[]{date.toString(), "Recieved: "+recDate.toString(), "Finish: "+finDate.toString(), String.valueOf(source), notes, String.valueOf(amount),String.valueOf(lri), status};
         for (int i =0; i< options.length; i++) {
             if(display[i] && options[i]!=null){
                 result = result+ "\n" + options[i];
