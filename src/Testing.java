@@ -89,7 +89,6 @@ public class Testing extends JFrame {
     };
 
 
-
     public Testing() throws SQLException {
         //setting the title of the window getting opened by the program
         super("The new goal");
@@ -105,9 +104,9 @@ public class Testing extends JFrame {
         nodes.add(new DataEntry("Graph",null));
         cellList = new ArrayList<>();
         cellList.add("Start Point");
-        Object parent = graph.getDefaultParent();
 
-        graph.getModel().beginUpdate();
+
+
         //Stylesheets that give nodes representing different data types different appearances
         //member stylesheet
         mxStylesheet stylesheet = graph.getStylesheet();
@@ -155,14 +154,19 @@ public class Testing extends JFrame {
         partnerDB = journeyDB.getPartners("select * from main_partners");
         productDB = journeyDB.getProducts("Select * from main_products");
 
+        mxGraphComponent graphComponent = new mxGraphComponent(graph);
+        getContentPane().add(graphComponent);
+
+        Object parent = graph.getDefaultParent();
+        graph.getModel().beginUpdate();
+
         try
         {
-            //todo give a layout so it looks nice
             int v1 = 20;
             int v2 =50;
             Object prevCell= null;
             for (MemberEntry currentCell:
-                 journeyDBmembers) {
+                    journeyDBmembers) {
                 //not having toString() causes errors that dont seem to affect the program
                 Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
 
@@ -181,9 +185,6 @@ public class Testing extends JFrame {
         {
             graph.getModel().endUpdate();
         }
-
-        mxGraphComponent graphComponent = new mxGraphComponent(graph);
-        getContentPane().add(graphComponent);
 
         //add listeners so the program can keep track of changes
         graph.getModel().addListener(mxEvent.UNDO, undoHandler);
@@ -273,7 +274,7 @@ public class Testing extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                Object parent = graph.getDefaultParent();
                 Object cell = graph.insertVertex(parent, label.toString(), "", getMousePosition(true).getX(),
                         getMousePosition(true).getY(),120, 50,"Custom");
                 label.progress();
@@ -306,6 +307,10 @@ public class Testing extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
+                String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
+                String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
+                        JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                choosePopulation(graph, selection);
             }
         });
         voidContext.add(menuItem);
@@ -355,12 +360,10 @@ public class Testing extends JFrame {
                     }
                 }
             }
-
             @Override
             public void mouseEntered(MouseEvent e) {
 
             }
-
             @Override
             public void mouseExited(MouseEvent e) {
 
@@ -380,8 +383,6 @@ public class Testing extends JFrame {
             }
         });
         memberContext.add(menuItem);
-
-
 
         menuItem = new JMenuItem("Toggle Emails");
         menuItem.setMnemonic(KeyEvent.VK_E);
@@ -615,7 +616,7 @@ public class Testing extends JFrame {
         memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Save Graph");
-        menuItem.setMnemonic(KeyEvent.VK_Z);
+        menuItem.setMnemonic(KeyEvent.VK_S);
         menuItem.getAccessibleContext().setAccessibleDescription("Save Graph");
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -729,6 +730,199 @@ public class Testing extends JFrame {
         voidContext.add(menuItem);
 
 
+    }
+/*
+    public void chooseClass(String selection){
+
+        switch (selection){
+            case "Members":
+                return MemberEntry.class;
+            case "Products":
+                return ProductEntry.class;
+            case "Partners":
+                return PartnerEntry.class;
+            case "Grants":
+                return GrantEntry.class;
+            case "Events":
+                return EventEntry.class;
+            default:
+                return MemberEntry.class;
+        }
+    }
+
+ */
+    public void choosePopulation(mxGraph graph, String selection){
+        switch (selection){
+            case "Members":
+                populateMembers(graph);
+                break;
+            case "Products":
+                populateProducts(graph);
+                break;
+            case "Partners":
+                populatePartners(graph);
+                break;
+            case "Grants":
+                populateGrants(graph);
+                break;
+            case "Events":
+                populateEvents(graph);
+                break;
+            default:
+                populateMembers(graph);
+                break;
+        }
+    }
+    //todo see if returning chooseclass into function allows for 1 funtion
+    public void populateMembers(mxGraph graph) {
+        Object parent = graph.getDefaultParent();
+        graph.getModel().beginUpdate();
+
+        try
+        {
+            int v1 = 20;
+            int v2 =50;
+            Object prevCell= null;
+            for (MemberEntry currentCell:
+                    journeyDBmembers) {
+                //not having toString() causes errors that dont seem to affect the program
+                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
+
+                v1+= 50;
+                v2+= 75;
+                nodes.add(currentCell);
+                cellList.add(cell);
+                label.progress();
+                if(prevCell != null){
+                    graph.insertEdge(parent,null, "",prevCell,cell);
+                }
+                prevCell = cell;
+            }
+        }
+        finally
+        {
+            graph.getModel().endUpdate();
+        }
+    }
+    public void populateGrants(mxGraph graph) {
+        Object parent = graph.getDefaultParent();
+        graph.getModel().beginUpdate();
+
+        try
+        {
+            int v1 = 20;
+            int v2 =50;
+            Object prevCell= null;
+            for (GrantEntry currentCell:
+                    dBgrants) {
+                //not having toString() causes errors that dont seem to affect the program
+                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
+
+                v1+= 50;
+                v2+= 75;
+                nodes.add(currentCell);
+                cellList.add(cell);
+                label.progress();
+                if(prevCell != null){
+                    graph.insertEdge(parent,null, "",prevCell,cell);
+                }
+                prevCell = cell;
+            }
+        }
+        finally
+        {
+            graph.getModel().endUpdate();
+        }
+    }
+    public void populateProducts(mxGraph graph) {
+        Object parent = graph.getDefaultParent();
+        graph.getModel().beginUpdate();
+
+        try
+        {
+            int v1 = 20;
+            int v2 =50;
+            Object prevCell= null;
+            for (ProductEntry currentCell:
+                    productDB) {
+                //not having toString() causes errors that dont seem to affect the program
+                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
+
+                v1+= 50;
+                v2+= 75;
+                nodes.add(currentCell);
+                cellList.add(cell);
+                label.progress();
+                if(prevCell != null){
+                    graph.insertEdge(parent,null, "",prevCell,cell);
+                }
+                prevCell = cell;
+            }
+        }
+        finally
+        {
+            graph.getModel().endUpdate();
+        }
+    }
+    public void populateEvents(mxGraph graph) {
+        Object parent = graph.getDefaultParent();
+        graph.getModel().beginUpdate();
+
+        try
+        {
+            int v1 = 20;
+            int v2 =50;
+            Object prevCell= null;
+            for (EventEntry currentCell:
+                    eventsDB) {
+                //not having toString() causes errors that dont seem to affect the program
+                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
+
+                v1+= 50;
+                v2+= 75;
+                nodes.add(currentCell);
+                cellList.add(cell);
+                label.progress();
+                if(prevCell != null){
+                    graph.insertEdge(parent,null, "",prevCell,cell);
+                }
+                prevCell = cell;
+            }
+        }
+        finally
+        {
+            graph.getModel().endUpdate();
+        }
+    }
+    public void populatePartners(mxGraph graph) {
+        Object parent = graph.getDefaultParent();
+        graph.getModel().beginUpdate();
+
+        try
+        {
+            int v1 = 20;
+            int v2 =50;
+            Object prevCell= null;
+            for (PartnerEntry currentCell:
+                    partnerDB) {
+                //not having toString() causes errors that dont seem to affect the program
+                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Partner");
+
+                v1+= 50;
+                v2+= 75;
+                nodes.add(currentCell);
+                cellList.add(cell);
+                label.progress();
+                if(prevCell != null){
+                    graph.insertEdge(parent,null, "",prevCell,cell);
+                }
+                prevCell = cell;
+            }
+        }
+        finally
+        {
+            graph.getModel().endUpdate();
+        }
     }
 
     //functions that add the right nodes to the graph based on user request
@@ -1067,9 +1261,6 @@ public class Testing extends JFrame {
         graph.refresh();
     }
 
-    public void findNodes(){
-
-    }
 
 
 
