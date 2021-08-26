@@ -2,24 +2,26 @@
 
 public class PartnerEntry extends DataEntry{
 
-    private int scope;
+    private String[] scope;
     private String notes;
-    private int type;
+    private String[] type;
     private boolean[] display;
+    private boolean english;
 
     public PartnerEntry(String name,String id) {
         super(name,id);
     }
 
-    public PartnerEntry(String name, String id, int scope, String notes, int type) {
+    public PartnerEntry(String name, String id, String[] type, String notes, String[] scope) {
         super(name, id);
         this.scope = scope;
         this.notes = notes;
         this.type = type;
+        this.english = true;
         this.display = new boolean[] {false,false,false};
     }
 
-    public int getScope() {
+    public String[] getScope() {
         return scope;
     }
 
@@ -27,7 +29,7 @@ public class PartnerEntry extends DataEntry{
         return notes;
     }
 
-    public int getType() {
+    public String[] getType() {
         return type;
     }
 
@@ -42,10 +44,14 @@ public class PartnerEntry extends DataEntry{
     public void toggleType(){
         display[2] = !display[2];
     }
+    public void toggleEnglish(){english= !english;}
 
     public String toString(){
         String result = name;
-        String[] options= {notes, String.valueOf(scope), String.valueOf(type)};
+        String[] options= {notes, String.valueOf(scope[0]), String.valueOf(type[0])};
+        if(!english){
+            options= new String[]{notes, String.valueOf(scope[1]), String.valueOf(type[1])};
+        }
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){
                 result = result+ "\n" + options[i];
@@ -80,6 +86,4 @@ public class PartnerEntry extends DataEntry{
         }
 
     }
-
-
 }

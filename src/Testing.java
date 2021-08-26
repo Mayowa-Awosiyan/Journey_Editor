@@ -264,7 +264,6 @@ public class Testing extends JFrame {
                 }
             }
         });
-
         voidContext.add(menuItem);
 
         //adding the ability to add new cells to the journey through the context menu
@@ -296,9 +295,93 @@ public class Testing extends JFrame {
                 //puts all currently selected cells into a variable
                 Object[] var = graph.getSelectionCells();
                 graph.removeCells(var);
+                Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
+                if(vertices.length ==0){
+                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
+                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
+                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    choosePopulation(graph, selection);
+                }
             }
         });
         memberContext.add(menuItem);
+        menuItem = new JMenuItem("Delete Selected Cell(s)");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Delete Selected Cell(s)");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //puts all currently selected cells into a variable
+                Object[] var = graph.getSelectionCells();
+                graph.removeCells(var);
+                Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
+                if(vertices.length ==0){
+                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
+                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
+                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    choosePopulation(graph, selection);
+                }
+            }
+        });
+        grantContext.add(menuItem);
+        menuItem = new JMenuItem("Delete Selected Cell(s)");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Delete Selected Cell(s)");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //puts all currently selected cells into a variable
+                Object[] var = graph.getSelectionCells();
+                graph.removeCells(var);
+                Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
+                if(vertices.length ==0){
+                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
+                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
+                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    choosePopulation(graph, selection);
+                }
+            }
+        });
+        eventContext.add(menuItem);
+
+        menuItem = new JMenuItem("Delete Selected Cell(s)");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Delete Selected Cell(s)");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //puts all currently selected cells into a variable
+                Object[] var = graph.getSelectionCells();
+                graph.removeCells(var);
+                Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
+                if(vertices.length ==0){
+                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
+                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
+                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    choosePopulation(graph, selection);
+                }
+            }
+        });
+        productContext.add(menuItem);
+        menuItem = new JMenuItem("Delete Selected Cell(s)");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Delete Selected Cell(s)");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //puts all currently selected cells into a variable
+                Object[] var = graph.getSelectionCells();
+                graph.removeCells(var);
+                Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
+                if(vertices.length ==0){
+                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
+                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
+                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    choosePopulation(graph, selection);
+                }
+            }
+        });
+        partnerContext.add(menuItem);
 
         menuItem = new JMenuItem("Clear All");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -472,6 +555,28 @@ public class Testing extends JFrame {
             }
         });
         grantContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle Type");
+        menuItem.setMnemonic(KeyEvent.VK_T);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Type");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,12);
+            }
+        });
+        partnerContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle Scope");
+        menuItem.setMnemonic(KeyEvent.VK_S);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Scope");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,13);
+            }
+        });
+        partnerContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Events");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -1104,8 +1209,8 @@ public class Testing extends JFrame {
             targetID = nodes.get(label.getTarget(targetID)).getId();
             ArrayList<PartnerEntry> cells;
             if(role.compareTo("Member") == 0){
-                cells = journeyDB.getPartners("Select * From main_partner, relp_Partner_member"+
-                        " where " + targetID+ " = relp_Partner_Member.member.ID and main_partners.id = relp_partner_member.partner_id");
+                cells = journeyDB.getPartners("Select * From main_partners, relp_Partner_member"+
+                        " where " + targetID+ " = relp_Partner_Member.member_ID and main_partners.id = relp_partner_member.partner_id");
             }
             else{
                 cells = journeyDB.getPartners("Select * From main_Partners, relp_"+role+"_Partner" +
@@ -1122,6 +1227,7 @@ public class Testing extends JFrame {
                     if(nodes.contains(currentCell)){
                         int target =nodes.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
+                        //todo change color of 2nd and onward edges
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
                         }
@@ -1240,6 +1346,12 @@ public class Testing extends JFrame {
                     break;
                 case 11:
                     currNode.toggleLRI();
+                    break;
+                case 12:
+                    currNode.toggleType();
+                    break;
+                case 13:
+                    currNode.toggleScope();
                     break;
             }
         }

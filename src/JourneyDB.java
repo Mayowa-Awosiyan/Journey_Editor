@@ -105,11 +105,12 @@ public class JourneyDB {
             while (resultSet.next()){
                 String id =resultSet.getString(1);
                 String fname= resultSet.getString(2);
-                int type =resultSet.getInt(5);
-                String notes = resultSet.getString(4);
-                int source = resultSet.getInt(3);
-
-                PartnerEntry entry = new PartnerEntry(fname,id,source,notes,type);
+                int scope =resultSet.getInt(4);
+                String[] scopes = getScope("select scope_en, scope_fr from types_partnershipscope where id =" + scope);
+                String notes = resultSet.getString(5);
+                int type = resultSet.getInt(3);
+                String[] type2 = getScope("Select type_en, type_fr from types_partnershiptype  where id = " + type);
+                PartnerEntry entry = new PartnerEntry(fname,id,type2,notes,scopes);
                 cells.add(entry);
             }
         } catch (SQLException throwables) {
@@ -117,6 +118,36 @@ public class JourneyDB {
         }
 
         return cells;
+    }
+
+    public String[] getScope(String query){
+        String[] scope = new String[2];
+        try{
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                scope[0] = resultSet.getString(1);
+                scope[1] = resultSet.getString(2);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return scope;
+    }
+
+    public String getType(String query){
+        String type = null;
+        try{
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                type = resultSet.getString(1);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return type;
     }
 
     public ArrayList<ProductEntry> getProducts(String query){
