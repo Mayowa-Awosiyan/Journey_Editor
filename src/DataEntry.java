@@ -86,6 +86,7 @@ public class DataEntry extends Object {
     public void setContent(String content){
         ;
     }
+    public void toggleFrench(){;}
     public void toggleScope(){;}
     public void toggleLRI(){;}
 

@@ -44,7 +44,7 @@ public class PartnerEntry extends DataEntry{
     public void toggleType(){
         display[2] = !display[2];
     }
-    public void toggleEnglish(){english= !english;}
+    public void toggleFrench(){english= !english;}
 
     public String toString(){
         String result = name;

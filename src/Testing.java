@@ -579,7 +579,7 @@ public class Testing extends JFrame {
         partnerContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Events");
-        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.setMnemonic(KeyEvent.VK_E);
         menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -589,6 +589,54 @@ public class Testing extends JFrame {
             }
         });
         memberContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Events");
+        menuItem.setMnemonic(KeyEvent.VK_E);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphEvents(graph,"Partner");
+
+            }
+        });
+        partnerContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Members");
+        menuItem.setMnemonic(KeyEvent.VK_M);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Members");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphMembers(graph,"Partner");
+
+            }
+        });
+        partnerContext.add(menuItem);
+
+        menuItem = new JMenuItem("Français");
+        menuItem.setMnemonic(KeyEvent.VK_F);
+        menuItem.getAccessibleContext().setAccessibleDescription("Français");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,14);
+
+            }
+        });
+        partnerContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Products");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Products");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphProducts(graph,"Partner");
+
+            }
+        });
+        partnerContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Dates");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -1352,6 +1400,9 @@ public class Testing extends JFrame {
                     break;
                 case 13:
                     currNode.toggleScope();
+                    break;
+                case 14:
+                    currNode.toggleFrench();
                     break;
             }
         }
