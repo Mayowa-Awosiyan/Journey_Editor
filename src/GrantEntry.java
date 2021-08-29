@@ -4,12 +4,14 @@ public class GrantEntry extends DataEntry{
     private Date date;
     private Date recDate;
     private Date finDate;
-    private int source;
+    private String[] source;
     private String notes;
     private boolean[] display;
     private Float amount;
     private boolean lri;
     private String status;
+
+    private boolean english;
     //todo figure what data type investigator is and implement it
     //private String investigator;
 
@@ -20,7 +22,7 @@ public class GrantEntry extends DataEntry{
         this.display = new boolean[] {false,false,false, false,false,false, false,false};
     }
 
-    public GrantEntry(String name, Date date, String id, Date recDate, Date finDate, int source,String notes, Float amount, boolean lri, String status) {
+    public GrantEntry(String name, Date date, String id, Date recDate, Date finDate, String[] source,String notes, Float amount, boolean lri, String status) {
         super(name,id);
         this.date=date;
         this.recDate = recDate;
@@ -30,6 +32,7 @@ public class GrantEntry extends DataEntry{
         this.notes= notes;
         this.lri = lri;
         this.status = status;
+        this.english= true;
         this.display = new boolean[] {false,false,false, false,false,false, false,false};
     }
 
@@ -49,7 +52,7 @@ public class GrantEntry extends DataEntry{
         return date;
     }
 
-    public int getSource() {
+    public String[] getSource() {
         return source;
     }
 
@@ -78,6 +81,7 @@ public class GrantEntry extends DataEntry{
     public void toggleStatus(){
         display[7]= !display[7];
     }
+    public void toggleFrench(){english= !english;}
 
     public String toString(){
         String result = name;
@@ -92,7 +96,11 @@ public class GrantEntry extends DataEntry{
         else if(recDate == null && display[5])
 
          */
-        String[] options= new String[]{date.toString(), "Recieved: "+recDate.toString(), "Finish: "+finDate.toString(), String.valueOf(source), notes, String.valueOf(amount),String.valueOf(lri), status};
+        String[] options= new String[]{date.toString(), "Recieved: "+recDate.toString(), "Finish: "+finDate.toString(), String.valueOf(source[0]), notes, String.valueOf(amount),String.valueOf(lri), status};
+
+        if(english){
+            options= new String[]{date.toString(), "Recieved: "+recDate.toString(), "Finish: "+finDate.toString(), String.valueOf(source[1]), notes, String.valueOf(amount),String.valueOf(lri), status};
+        }
         for (int i =0; i< options.length; i++) {
             if(display[i] && options[i]!=null){
                 result = result+ "\n" + options[i];

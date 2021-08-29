@@ -58,7 +58,7 @@ import java.util.List;
 
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
-public class Testing extends JFrame {
+public class JourneyEditor extends JFrame {
 
     mxUndoManager undoManager;
 
@@ -89,7 +89,7 @@ public class Testing extends JFrame {
     };
 
 
-    public Testing() throws SQLException {
+    public JourneyEditor() throws SQLException {
         //setting the title of the window getting opened by the program
         super("The new goal");
         currLayout= 1;
@@ -363,6 +363,7 @@ public class Testing extends JFrame {
             }
         });
         productContext.add(menuItem);
+
         menuItem = new JMenuItem("Delete Selected Cell(s)");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Delete Selected Cell(s)");
@@ -457,6 +458,16 @@ public class Testing extends JFrame {
         //functionality to show dates/phone numbers/emails/etc.
         //todo add keyboard shortcuts
         menuItem = new JMenuItem("Toggle Dates");
+        menuItem.setMnemonic(KeyEvent.VK_D);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Dates");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,0);
+            }
+        });
+        eventContext.add(menuItem);
+        menuItem = new JMenuItem("Toggle Dates");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Toggle Dates");
         menuItem.addActionListener(new ActionListener() {
@@ -466,6 +477,26 @@ public class Testing extends JFrame {
             }
         });
         memberContext.add(menuItem);
+        menuItem = new JMenuItem("Toggle Dates");
+        menuItem.setMnemonic(KeyEvent.VK_D);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Dates");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,0);
+            }
+        });
+        productContext.add(menuItem);
+        menuItem = new JMenuItem("Toggle Type");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Type");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,12);
+            }
+        });
+        eventContext.add(menuItem);
 
         menuItem = new JMenuItem("Toggle Emails");
         menuItem.setMnemonic(KeyEvent.VK_E);
@@ -509,7 +540,6 @@ public class Testing extends JFrame {
                 displayInfo(graph,4);
             }
         });
-
         memberContext.add(menuItem);
 
         menuItem = new JMenuItem("Toggle City");
@@ -567,6 +597,28 @@ public class Testing extends JFrame {
         });
         partnerContext.add(menuItem);
 
+        menuItem = new JMenuItem("Toggle Type");
+        menuItem.setMnemonic(KeyEvent.VK_T);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle Type");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,12);
+            }
+        });
+        productContext.add(menuItem);
+
+        menuItem = new JMenuItem("Toggle StakeHolder");
+        menuItem.setMnemonic(KeyEvent.VK_S);
+        menuItem.getAccessibleContext().setAccessibleDescription("Toggle StakeHolder");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayInfo(graph,15);
+            }
+        });
+        productContext.add(menuItem);
+
         menuItem = new JMenuItem("Toggle Scope");
         menuItem.setMnemonic(KeyEvent.VK_S);
         menuItem.getAccessibleContext().setAccessibleDescription("Toggle Scope");
@@ -597,10 +649,31 @@ public class Testing extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateGraphEvents(graph,"Partner");
-
             }
         });
         partnerContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Future Events");
+        menuItem.setMnemonic(KeyEvent.VK_F);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Future Events");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphNextEvents(graph);
+            }
+        });
+        eventContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Past Events");
+        menuItem.setMnemonic(KeyEvent.VK_A);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Past Events");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphPastEvents(graph);
+            }
+        });
+        eventContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Members");
         menuItem.setMnemonic(KeyEvent.VK_M);
@@ -624,7 +697,7 @@ public class Testing extends JFrame {
 
             }
         });
-        partnerContext.add(menuItem);
+        voidContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Products");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -638,13 +711,13 @@ public class Testing extends JFrame {
         });
         partnerContext.add(menuItem);
 
-        menuItem = new JMenuItem("Show Dates");
+        menuItem = new JMenuItem("Show Products");
         menuItem.setMnemonic(KeyEvent.VK_P);
-        menuItem.getAccessibleContext().setAccessibleDescription("Show Dates");
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Products");
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                displayInfo(graph,0);
+                updateGraphProducts(graph,"Event");
 
             }
         });
@@ -661,6 +734,17 @@ public class Testing extends JFrame {
             }
         });
         grantContext.add(menuItem);
+        menuItem = new JMenuItem("Show Events");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphEvents(graph,"Product");
+
+            }
+        });
+        productContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Grant Origin");
         menuItem.setMnemonic(KeyEvent.VK_O);
@@ -704,11 +788,20 @@ public class Testing extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateGraphPartners(graph, "Member");
-
             }
         });
         memberContext.add(menuItem);
 
+        menuItem = new JMenuItem("Show Partners");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Partners");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphPartners(graph, "Event");
+            }
+        });
+        eventContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Grants");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -755,6 +848,17 @@ public class Testing extends JFrame {
         });
         grantContext.add(menuItem);
 
+        menuItem = new JMenuItem("Show Members");
+        menuItem.setMnemonic(KeyEvent.VK_M);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Members");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphMembers(graph, "Product");
+            }
+        });
+        productContext.add(menuItem);
+
 
 
         menuItem = new JMenuItem("Show Products");
@@ -764,17 +868,6 @@ public class Testing extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateGraphProducts(graph,"Member");
-            }
-        });
-        memberContext.add(menuItem);
-
-        menuItem = new JMenuItem("Save Graph");
-        menuItem.setMnemonic(KeyEvent.VK_S);
-        menuItem.getAccessibleContext().setAccessibleDescription("Save Graph");
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               ;
             }
         });
         memberContext.add(menuItem);
@@ -800,9 +893,9 @@ public class Testing extends JFrame {
         JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         fileChooser.setDialogTitle("Save as");
 
-        menuItem = new JMenuItem("Save File");
+        menuItem = new JMenuItem("Save Journey");
         menuItem.setMnemonic(KeyEvent.VK_S);
-        menuItem.getAccessibleContext().setAccessibleDescription("Save File");
+        menuItem.getAccessibleContext().setAccessibleDescription("Save Journey");
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -851,8 +944,8 @@ public class Testing extends JFrame {
 
         voidContext.add(menuItem);
 
-        menuItem = new JMenuItem("Load Graph");
-        menuItem.getAccessibleContext().setAccessibleDescription("Load Graph");
+        menuItem = new JMenuItem("Load Journey");
+        menuItem.getAccessibleContext().setAccessibleDescription("Load Journey");
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -926,7 +1019,7 @@ public class Testing extends JFrame {
                 break;
         }
     }
-    //todo see if returning chooseclass into function allows for 1 funtion
+    //TODO
     public void populateMembers(mxGraph graph) {
         Object parent = graph.getDefaultParent();
         graph.getModel().beginUpdate();
@@ -1131,6 +1224,119 @@ public class Testing extends JFrame {
         }
     }
 
+    public void updateGraphNextEvents(mxGraph graph){
+        Object parent = graph.getDefaultParent();
+        Object[] targets = graph.getSelectionCells();
+
+        for(Object addition : targets){
+            if(((mxCell) addition).isEdge()){
+                continue;
+            }
+            mxCell thing = (mxCell) addition;
+            //this is the id of the node
+            String targetID =thing.getId();
+            //this is the id in the database
+            targetID = nodes.get(label.getTarget(targetID)).getId();
+
+            ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_Event where "
+                    + targetID+ " = relp_Event_Event.past_event_ID and main_events.id = relp_event_Event.future_event_id");
+            try
+            {
+                int v1 = 200;
+                int v2 =50;
+
+                for (EventEntry currentCell:
+                        cells) {
+
+                    if(nodes.contains(currentCell)){
+
+                        int target =nodes.indexOf(currentCell);
+                        //wont create new edges that are identical to existing ones
+                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
+                            ;
+                        }
+                        //wont loop to itself
+                        else if(cellList.get(target).equals(addition)){
+                            ;
+                        }
+                        else {
+                            graph.insertEdge(parent,null,"Leads to",cellList.get(target),addition);
+                        }
+                    }
+                    else {
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
+                        v1+= 50;
+                        v2+= 75;
+                        label.progress();
+                        nodes.add(currentCell);
+                        cellList.add(cell);
+                        graph.insertEdge(parent,null, "Leads to",addition,cell);
+
+                    }
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
+
+    public void updateGraphPastEvents(mxGraph graph){
+        Object parent = graph.getDefaultParent();
+        Object[] targets = graph.getSelectionCells();
+
+        for(Object addition : targets){
+            if(((mxCell) addition).isEdge()){
+                continue;
+            }
+            mxCell thing = (mxCell) addition;
+            //this is the id of the node
+            String targetID =thing.getId();
+            //this is the id in the database
+            targetID = nodes.get(label.getTarget(targetID)).getId();
+
+            ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_Event where "
+                    + targetID+ " = relp_Event_Event.future_event_ID and main_events.id = relp_event_Event.past_event_id");
+            try
+            {
+                int v1 = 200;
+                int v2 =50;
+
+                for (EventEntry currentCell:
+                        cells) {
+
+                    if(nodes.contains(currentCell)){
+
+                        int target =nodes.indexOf(currentCell);
+                        //wont create new edges that are identical to existing ones
+                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
+                            ;
+                        }
+                        //wont loop to itself
+                        else if(cellList.get(target).equals(addition)){
+                            ;
+                        }
+                        else {
+                            graph.insertEdge(parent,null,"",cellList.get(target),addition);
+
+                        }
+                    }
+                    else {
+                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
+                        v1+= 50;
+                        v2+= 75;
+                        label.progress();
+                        nodes.add(currentCell);
+                        cellList.add(cell);
+                        graph.insertEdge(parent,null, "Leads to",cell,addition);
+
+                    }
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
+
     public void updateGraphGrants(mxGraph graph, String role){
 
         Object parent = graph.getDefaultParent();
@@ -1312,7 +1518,6 @@ public class Testing extends JFrame {
             String targetID =thing.getId();
             //this is the id in the database
             targetID = nodes.get(label.getTarget(targetID)).getId();
-
             ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_members, relp_"+role+"_member " +
                     "where " + targetID+ " = relp_"+role+"_member."+role+"_ID and main_members.id = relp_"+ role+"_member.Member_id");
             try
@@ -1348,9 +1553,7 @@ public class Testing extends JFrame {
                 exception.printStackTrace();
             }
         }
-
     }
-
     //function to display requested info
     public void displayInfo(mxGraph graph,int choice){
         int count = 0;
@@ -1404,6 +1607,11 @@ public class Testing extends JFrame {
                 case 14:
                     currNode.toggleFrench();
                     break;
+                case 15:
+                    currNode.toggleStakeHolder();
+                    break;
+                case 16:
+                    currNode.toggleTheme();
             }
         }
         int index =1;
@@ -1430,10 +1638,27 @@ public class Testing extends JFrame {
     //Early testing to get used to all the new functions I will be using as part of this project
     public static void main(String[] args) throws SQLException {
 
-        //todo add a dialog box to kick start the diagram (potentially always available)
-
-        Testing frame = new Testing();
+        //todo change dialog box to put one element of user's choosing
+        //todo ask user for location of database
+        //todo look into .bat file to save db name
+        //todo rework starting graph to be one selectable node
+        //todo rework labelling
+        //todo event missing relations
+        //todo flip between english and french
+        JFileChooser file;
+        JourneyEditor frame = new JourneyEditor();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        /*
+        if(args.length == 1)
+        {
+            JourneyEditor(args[0]);
+        }
+        else {
+            frame = new JourneyEditor();
+        }
+
+         */
 
         //sets the default size of the window default 400, 320
         frame.setSize(700, 620);

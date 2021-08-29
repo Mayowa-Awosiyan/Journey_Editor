@@ -58,7 +58,10 @@ public class JourneyDB {
                 Date dateJ = resultSet.getDate(4);
                 String notes = resultSet.getString(6);
                 int type = resultSet.getInt(7);
-                EventEntry entry = new EventEntry(fname,dateJ,id,lname,type,endDate,notes);
+                ArrayList<String[]> themes = getThemes("Select theme_id from relp_event_theme where event_id =" + id, id);
+                String[] types = getEngAndFrench("Select type_en, type_fr from types_event where id ="+type);
+
+                EventEntry entry = new EventEntry(fname,dateJ,id,lname,types,endDate,notes,themes);
                 cells.add(entry);
             }
         } catch (SQLException throwables) {
@@ -82,11 +85,12 @@ public class JourneyDB {
                 Date dateJ = resultSet.getDate(6);
                 String notes = resultSet.getString(10);
                 int source = resultSet.getInt(9);
+                String[] source2 = getEngAndFrench("Select type_en, type_fr from types_grantsource where id = " +source);
                 Date fin = resultSet.getDate(8);
                 boolean lri =resultSet.getBoolean(4);
                 String status = resultSet.getString(5);
 
-                GrantEntry entry = new GrantEntry(fname,dateJ,id,endDate,fin,source,notes, amount,lri,status);
+                GrantEntry entry = new GrantEntry(fname,dateJ,id,endDate,fin,source2,notes, amount,lri,status);
                 cells.add(entry);
             }
         } catch (SQLException throwables) {
@@ -106,10 +110,10 @@ public class JourneyDB {
                 String id =resultSet.getString(1);
                 String fname= resultSet.getString(2);
                 int scope =resultSet.getInt(4);
-                String[] scopes = getScope("select scope_en, scope_fr from types_partnershipscope where id =" + scope);
+                String[] scopes = getEngAndFrench("select scope_en, scope_fr from types_partnershipscope where id =" + scope);
                 String notes = resultSet.getString(5);
                 int type = resultSet.getInt(3);
-                String[] type2 = getScope("Select type_en, type_fr from types_partnershiptype  where id = " + type);
+                String[] type2 = getEngAndFrench("Select type_en, type_fr from types_partnershiptype  where id = " + type);
                 PartnerEntry entry = new PartnerEntry(fname,id,type2,notes,scopes);
                 cells.add(entry);
             }
@@ -120,34 +124,20 @@ public class JourneyDB {
         return cells;
     }
 
-    public String[] getScope(String query){
-        String[] scope = new String[2];
+    public String[] getEngAndFrench(String query){
+        String[] strings = new String[2];
         try{
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()){
-                scope[0] = resultSet.getString(1);
-                scope[1] = resultSet.getString(2);
+                strings[0] = resultSet.getString(1);
+                strings[1] = resultSet.getString(2);
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
 
-        return scope;
-    }
-
-    public String getType(String query){
-        String type = null;
-        try{
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()){
-                type = resultSet.getString(1);
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return type;
+        return strings;
     }
 
     public ArrayList<ProductEntry> getProducts(String query){
@@ -165,8 +155,10 @@ public class JourneyDB {
                 String doi =resultSet.getString(6);
                 String notes = resultSet.getString(8);
                 int type = resultSet.getInt(9);
-
-                ProductEntry entry = new ProductEntry(fname,id,date,ongoing,reviewed,doi,notes,type);
+                String[] type2 = getEngAndFrench("Select type_en, type_fr from types_product where id = " + type);
+                ArrayList<String[]> stake = getStakeHolders("Select target_stakeholder_id from relp_product_TargetStakeholder where " +id
+                        + " = relp_product_targetstakeholder.product_id", id);
+                ProductEntry entry = new ProductEntry(fname,id,date,ongoing,reviewed,doi,notes,type2,stake);
                 cells.add(entry);
             }
         } catch (SQLException throwables) {
@@ -174,6 +166,68 @@ public class JourneyDB {
         }
 
         return cells;
+    }
+
+    public ArrayList<String[]> getStakeHolders(String query, String id){
+        ArrayList<String[]> stakes = new ArrayList<>();
+        ArrayList<String> selected = new ArrayList<String>();
+        try{
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                selected.add(resultSet.getString(1));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        for(String currId: selected){
+            try{
+                query = "select name_en, name_fr from types_targetstakeholder where id ="+ currId;
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query);
+                while (resultSet.next()){
+                    String[] holders = new String[2];
+                    holders[0] = resultSet.getString(1);
+                    holders[1] = resultSet.getString(2);
+                    stakes.add(holders);
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+
+        return stakes;
+    }
+
+    public ArrayList<String[]> getThemes(String query, String id){
+        ArrayList<String[]> stakes = new ArrayList<>();
+        ArrayList<String> selected = new ArrayList<String>();
+        try{
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                selected.add(resultSet.getString(1));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        for(String currId: selected){
+            try{
+                query = "select name_en, name_fr from types_theme where theme_id ="+ currId;
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query);
+                while (resultSet.next()){
+                    String[] holders = new String[2];
+                    holders[0] = resultSet.getString(1);
+                    holders[1] = resultSet.getString(2);
+                    stakes.add(holders);
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+
+        return stakes;
     }
 
     public static void main(String[] args) {

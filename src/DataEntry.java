@@ -1,5 +1,3 @@
-
-
 //custom created class to hold information based on various
 public class DataEntry extends Object {
 
@@ -17,7 +15,6 @@ public class DataEntry extends Object {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -51,7 +48,6 @@ public class DataEntry extends Object {
         }
     }
 
-
     //placeholder functions to be overridden
     public String getStyle(){
         return style;
@@ -83,21 +79,16 @@ public class DataEntry extends Object {
     public void toggleAmount(){
         ;
     }
-    public void setContent(String content){
-        ;
-    }
+    public void setContent(String content){;}
+    public void toggleStakeHolder(){;}
     public void toggleFrench(){;}
     public void toggleScope(){;}
     public void toggleLRI(){;}
-
     public void toggleStatus(){;}
-
     public void toggleRecDate(){;}
-
     public void toggleFinDate(){
         ;
     }
-
     public void toggleSource(){
         ;
     }

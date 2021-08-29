@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Date;
 
 public class ProductEntry extends DataEntry{
@@ -7,15 +8,18 @@ public class ProductEntry extends DataEntry{
     private boolean peerReviewed;
     private String doi;
     private String notes;
-    private int type;
+    private String[] type;
     private boolean[] display;
+    private ArrayList<String[]> stakeholder;
+    private boolean english;
 
 
     public ProductEntry(String name, String id) {
         super(name, id);
     }
 
-    public ProductEntry(String name, String id, Date date, boolean ongoing, boolean peerReviewed, String doi, String notes, int type) {
+    //todo consider moving the english boolean to be a global variable in journeyeditor
+    public ProductEntry(String name, String id, Date date, boolean ongoing, boolean peerReviewed, String doi, String notes, String[] type, ArrayList<String[]> stakeholder) {
         super(name, id);
         this.date = date;
         this.ongoing = ongoing;
@@ -23,7 +27,8 @@ public class ProductEntry extends DataEntry{
         this.doi = doi;
         this.notes = notes;
         this.type = type;
-        this.display = new boolean[] {false,false,false,false,false,false};
+        this.stakeholder=stakeholder;
+        this.display = new boolean[] {false,false,false,false,false,false,false};
     }
 
     public Date getDate() {
@@ -46,9 +51,11 @@ public class ProductEntry extends DataEntry{
         return notes;
     }
 
-    public int getType() {
+    public String[] getType() {
         return type;
     }
+
+    public void toogleFrench(){english=!english;}
 
     public void toggleDate(){
         display[0] = !display[0];
@@ -68,10 +75,50 @@ public class ProductEntry extends DataEntry{
     public void toggleType(){
         display[5] = !display[5];
     }
+    public void toggleStakeHolder(){
+        display[6] = !display[6];
+    }
+
+    public String[] stakeHolders(ArrayList<String[]> stakes){
+        String[] holders = new String[stakes.size()];
+
+        for(int i = 0;i<stakes.size();i++){
+            if(english){
+                holders[i] = stakes.get(i)[0];
+            }
+            else {
+                holders[i] = stakes.get(i)[1];
+            }
+        }
+        return holders;
+    }
 
     public String toString(){
         String result = name;
-        String[] options= {date.toString(),String.valueOf(ongoing),String.valueOf(peerReviewed), doi,notes, String.valueOf(type)};
+        String stakes;
+        if(stakeholder.size() > 0){
+            String[] tmp = stakeHolders(stakeholder);
+            stakes = tmp[0];
+            for(String curr: tmp){
+                if(curr.equals(tmp[0])){
+                    continue;
+                }
+                stakes = stakes + "\n"+ curr;
+            }
+        }
+        else{
+            stakes = null;
+        }
+        String prodType;
+        if(english){
+            prodType= type[0];
+        }
+        else{
+            prodType = type[1];
+        }
+
+        String[] options= {date.toString(),String.valueOf(ongoing),String.valueOf(peerReviewed), doi,notes, prodType,stakes};
+
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){
                 result = result+ "\n" + options[i];

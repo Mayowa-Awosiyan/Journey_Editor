@@ -53,7 +53,7 @@ public class PartnerEntry extends DataEntry{
             options= new String[]{notes, String.valueOf(scope[1]), String.valueOf(type[1])};
         }
         for (int i =0; i< display.length; i++) {
-            if(display[i] && options[i]!=null){
+            if(display[i] && (options[i]!=null || options[i].equals(""))){
                 result = result+ "\n" + options[i];
             }
         }
