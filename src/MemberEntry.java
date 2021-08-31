@@ -7,12 +7,13 @@ public class MemberEntry extends DataEntry{
     private Date date;
     private String email;
     private String business;
-    private String faculty;
+    private String[] faculty;
     private String phone;
     private String city;
+    private boolean english;
     private boolean[] display;
 
-    public MemberEntry(String name,Date date,String id,  String lname, String email, String business, String faculty, String phone, String city) {
+    public MemberEntry(String name,Date date,String id,  String lname, String email, String business, String[] faculty, String phone, String city) {
 
         super(name, id);
         this.name= name;
@@ -23,6 +24,7 @@ public class MemberEntry extends DataEntry{
         this.faculty = faculty;
         this.phone = phone;
         this.city = city;
+        this.english = true;
         this.display= new boolean[]{false, false, false, false, false, false};
     }
 
@@ -78,11 +80,11 @@ public class MemberEntry extends DataEntry{
         this.business = business;
     }
 
-    public String getFaculty() {
+    public String[] getFaculty() {
         return faculty;
     }
 
-    public void setFaculty(String faculty) {
+    public void setFaculty(String[] faculty) {
         this.faculty = faculty;
     }
 
@@ -120,11 +122,15 @@ public class MemberEntry extends DataEntry{
     public void toggleCity(){
         display[5] = !display[5];
     }
+    public void toggleEnglish(){english=!english;}
 
     //conditional toString method that by default prints name and last name
     public String toString(){
         String result = name + " " + lname;
-        String[] options= {date.toString(),email,business,faculty,phone,city};
+        String[] options= {date.toString(),email,business,faculty[0],phone,city};
+        if(!english){
+            options= new String[]{date.toString(),email,business,faculty[1],phone,city};
+        }
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){
                 result = result+ "\n" + options[i];

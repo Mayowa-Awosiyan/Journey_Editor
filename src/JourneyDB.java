@@ -31,7 +31,8 @@ public class JourneyDB {
                 Date dateJ = (Date) resultSet.getDate(5);
                 String bui = resultSet.getString(4);
                 String email = resultSet.getString("email");
-                String fac = resultSet.getString("faculty");
+                String facNum = resultSet.getString("faculty");
+                String[] fac = getEngAndFrench("Select name_en, name_fr from types_faculty where id ="+ facNum);
                 String phone = resultSet.getString("mobile_phone");
                 String city = resultSet.getString("city");
                 MemberEntry entry = new MemberEntry(fname,dateJ,id,lname,email,bui,fac,phone,city);

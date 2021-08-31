@@ -1061,7 +1061,7 @@ public class JourneyEditor extends JFrame {
                 nodes.add(currentCell);
                 cellList.add(cell);
                 if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell);
+                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
                 }
                 prevCell = cell;
             }
@@ -1091,7 +1091,7 @@ public class JourneyEditor extends JFrame {
                 nodes.add(currentCell);
                 cellList.add(cell);
                 if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell);
+                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
                 }
                 prevCell = cell;
             }
@@ -1122,7 +1122,7 @@ public class JourneyEditor extends JFrame {
                 cellList.add(cell);
 
                 if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell);
+                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
                 }
                 prevCell = cell;
             }
@@ -1152,7 +1152,7 @@ public class JourneyEditor extends JFrame {
                 nodes.add(currentCell);
                 cellList.add(cell);
                 if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell);
+                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
                 }
                 prevCell = cell;
             }
@@ -1182,7 +1182,7 @@ public class JourneyEditor extends JFrame {
                 nodes.add(currentCell);
                 cellList.add(cell);
                 if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell);
+                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
                 }
                 prevCell = cell;
             }
@@ -1225,7 +1225,7 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,cellList.get(target));
+                            graph.insertEdge(parent,null,"",addition,cellList.get(target),"Edge");
                         }
                     }
                     else {
@@ -1235,7 +1235,7 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         nodes.add(currentCell);
                         cellList.add(cell);
-                        graph.insertEdge(parent,null, "",addition,cell);
+                        graph.insertEdge(parent,null, "",addition,cell,"Edge");
 
                     }
                 }
@@ -1281,7 +1281,7 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"Leads to",cellList.get(target),addition);
+                            graph.insertEdge(parent,null,"Leads to",cellList.get(target),addition,"Edge");
                         }
                     }
                     else {
@@ -1291,7 +1291,7 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         nodes.add(currentCell);
                         cellList.add(cell);
-                        graph.insertEdge(parent,null, "Leads to",addition,cell);
+                        graph.insertEdge(parent,null, "Leads to",addition,cell,"Edge");
 
                     }
                 }
@@ -1337,7 +1337,7 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",cellList.get(target),addition);
+                            graph.insertEdge(parent,null,"",cellList.get(target),addition,"Edge");
 
                         }
                     }
@@ -1348,7 +1348,7 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         nodes.add(currentCell);
                         cellList.add(cell);
-                        graph.insertEdge(parent,null, "Leads to",cell,addition);
+                        graph.insertEdge(parent,null, "Leads to",cell,addition,"Edge");
 
                     }
                 }
@@ -1396,7 +1396,7 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,cellList.get(target));
+                            graph.insertEdge(parent,null,"",addition,cellList.get(target),"Edge");
                         }
                     }
                     else {
@@ -1406,7 +1406,7 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         nodes.add(currentCell);
                         cellList.add(cell);
-                        graph.insertEdge(parent,null, "",addition,cell);
+                        graph.insertEdge(parent,null, "",addition,cell,"Edge");
 
                     }
                 }
@@ -1452,7 +1452,7 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,cellList.get(target));
+                            graph.insertEdge(parent,null,"",addition,cellList.get(target),"Edge");
                         }
                     }
                     else {
@@ -1462,7 +1462,7 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         nodes.add(currentCell);
                         cellList.add(cell);
-                        graph.insertEdge(parent,null, "",addition,cell);
+                        graph.insertEdge(parent,null, "",addition,cell,"Edge");
                     }
                 }
             } catch (Exception exception) {
@@ -1480,6 +1480,7 @@ public class JourneyEditor extends JFrame {
             String targetID =thing.getId();
             //this is the id in the database
             targetID= String.valueOf(partnerLabel.getTarget(targetID,role));
+            System.out.println(targetID);
             ArrayList<PartnerEntry> cells;
             if(role.compareTo("Member") == 0){
                 cells = journeyDB.getPartners("Select * From main_partners, relp_Partner_member"+
@@ -1505,7 +1506,7 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,cellList.get(target));
+                            graph.insertEdge(parent,null,"",addition,cellList.get(target),"Edge");
                         }
                     }
                     else {
@@ -1515,7 +1516,7 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         nodes.add(currentCell);
                         cellList.add(cell);
-                        graph.insertEdge(parent,null, "",addition,cell);
+                        graph.insertEdge(parent,null, "",addition,cell,"Edge");
                     }
                 }
             } catch (Exception exception) {
@@ -1553,7 +1554,7 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",cellList.get(target),addition);
+                            graph.insertEdge(parent,null,"",cellList.get(target),addition,"Edge");
                         }
                     }
                     else {
@@ -1563,7 +1564,7 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         nodes.add(currentCell);
                         cellList.add(cell);
-                        graph.insertEdge(parent,null, "",cell,addition);
+                        graph.insertEdge(parent,null, "",cell,addition,"Edge");
                     }
                 }
             } catch (Exception exception) {
