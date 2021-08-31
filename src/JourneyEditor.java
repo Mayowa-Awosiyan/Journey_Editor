@@ -317,7 +317,6 @@ public class JourneyEditor extends JFrame {
                     String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
                     String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
                             JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
-                    choosePopulation(graph, selection);
                 }
             }
         });
@@ -336,7 +335,6 @@ public class JourneyEditor extends JFrame {
                     String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
                     String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
                             JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
-                    choosePopulation(graph, selection);
                 }
             }
         });
@@ -355,7 +353,6 @@ public class JourneyEditor extends JFrame {
                     String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
                     String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
                             JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
-                    choosePopulation(graph, selection);
                 }
             }
         });
@@ -375,7 +372,6 @@ public class JourneyEditor extends JFrame {
                     String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
                     String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
                             JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
-                    choosePopulation(graph, selection);
                 }
             }
         });
@@ -395,7 +391,6 @@ public class JourneyEditor extends JFrame {
                     String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
                     String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
                             JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
-                    choosePopulation(graph, selection);
                 }
             }
         });
@@ -408,10 +403,6 @@ public class JourneyEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
-                String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
-                String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
-                        JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
-                choosePopulation(graph, selection);
             }
         });
         voidContext.add(menuItem);
@@ -921,31 +912,11 @@ public class JourneyEditor extends JFrame {
                 int userSelection = fileChooser.showSaveDialog(graphComponent);
                 File fileToSave = fileChooser.getSelectedFile();
                 if (userSelection == JFileChooser.APPROVE_OPTION) {
-                    /*
-                    if(String.valueOf(fileToSave).contains(".pdf")){
-
-                        try {
-                            PdfExport pdfExport = new PdfExport(graph,fileToSave);
-                        } catch (Exception exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-                    else{
-                        try {
-                            PdfExport pdfExport = new PdfExport(graph,new File(fileToSave + ".pdf"));
-                        } catch (Exception exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-
-                     */
-
                     String filename=fileToSave.getAbsolutePath().toString();
                     mxCodecRegistry.register(new mxModelCodec( new mxGraphModel()));
                     try {
 
                         mxGraph graph = graphComponent.getGraph();
-
                         // taken from EditorActions class
                         mxCodec codec = new mxCodec();
                         String xml = mxXmlUtils.getXml(codec.encode(graph.getModel()));
@@ -989,208 +960,25 @@ public class JourneyEditor extends JFrame {
                     } catch (IOException ioException) {
                         ioException.printStackTrace();
                     }
-
                     graph.refresh();
                 }
             }
         });
         voidContext.add(menuItem);
-
-
-    }
-/*
-    public void chooseClass(String selection){
-
-        switch (selection){
-            case "Members":
-                return MemberEntry.class;
-            case "Products":
-                return ProductEntry.class;
-            case "Partners":
-                return PartnerEntry.class;
-            case "Grants":
-                return GrantEntry.class;
-            case "Events":
-                return EventEntry.class;
-            default:
-                return MemberEntry.class;
-        }
     }
 
- */
-    public void choosePopulation(mxGraph graph, String selection){
-        switch (selection){
-            case "Members":
-                populateMembers(graph);
-                break;
-            case "Products":
-                populateProducts(graph);
-                break;
-            case "Partners":
-                populatePartners(graph);
-                break;
-            case "Grants":
-                populateGrants(graph);
-                break;
-            case "Events":
-                populateEvents(graph);
-                break;
-            default:
-                populateMembers(graph);
-                break;
-        }
-    }
-    //TODO replace these with a function that only adds one chosen node
-    public void populateMembers(mxGraph graph) {
-        Object parent = graph.getDefaultParent();
-        graph.getModel().beginUpdate();
+    public void startGraph(mxGraph graph, mxGraphComponent graphComponent, String selected){
 
-        try
-        {
-            int v1 = 20;
-            int v2 =50;
-            Object prevCell= null;
-            for (MemberEntry currentCell:
-                    journeyDBmembers) {
-                //not having toString() causes errors that dont seem to affect the program
-                memberlabel.setId(Integer.parseInt(currentCell.getId()));
-                Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
-
-                v1+= 50;
-                v2+= 75;
-                nodes.add(currentCell);
-                cellList.add(cell);
-                if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
-                }
-                prevCell = cell;
-            }
+        String[] choices =new String[] {"Member", "Product", "Grant","Partner","Event"};
+        String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
+                JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+        ArrayList<String> tmp = journeyDB.getNames(selection);
+        String[] targets = new String[tmp.size()];
+        for (int i = 0; i < tmp.size(); i++) {
+            targets[i] = tmp.get(i);
         }
-        finally
-        {
-            graph.getModel().endUpdate();
-        }
-    }
-    public void populateGrants(mxGraph graph) {
-        Object parent = graph.getDefaultParent();
-        graph.getModel().beginUpdate();
-
-        try
-        {
-            int v1 = 20;
-            int v2 =50;
-            Object prevCell= null;
-            for (GrantEntry currentCell:
-                    dBgrants) {
-                //not having toString() causes errors that dont seem to affect the program
-                grantLabel.setId(Integer.parseInt(currentCell.getId()));
-                Object cell = graph.insertVertex(parent, grantLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
-
-                v1+= 50;
-                v2+= 75;
-                nodes.add(currentCell);
-                cellList.add(cell);
-                if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
-                }
-                prevCell = cell;
-            }
-        }
-        finally
-        {
-            graph.getModel().endUpdate();
-        }
-    }
-    public void populateProducts(mxGraph graph) {
-        Object parent = graph.getDefaultParent();
-        graph.getModel().beginUpdate();
-
-        try
-        {
-            int v1 = 20;
-            int v2 =50;
-            Object prevCell= null;
-            for (ProductEntry currentCell:
-                    productDB) {
-                //not having toString() causes errors that dont seem to affect the program
-                memberlabel.setId(Integer.parseInt(currentCell.getId()));
-                Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
-
-                v1+= 50;
-                v2+= 75;
-                nodes.add(currentCell);
-                cellList.add(cell);
-
-                if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
-                }
-                prevCell = cell;
-            }
-        }
-        finally
-        {
-            graph.getModel().endUpdate();
-        }
-    }
-    public void populateEvents(mxGraph graph) {
-        Object parent = graph.getDefaultParent();
-        graph.getModel().beginUpdate();
-
-        try
-        {
-            int v1 = 20;
-            int v2 =50;
-            Object prevCell= null;
-            for (EventEntry currentCell:
-                    eventsDB) {
-                //not having toString() causes errors that dont seem to affect the program
-                eventLabel.setId(Integer.parseInt(currentCell.getId()));
-                Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
-
-                v1+= 50;
-                v2+= 75;
-                nodes.add(currentCell);
-                cellList.add(cell);
-                if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
-                }
-                prevCell = cell;
-            }
-        }
-        finally
-        {
-            graph.getModel().endUpdate();
-        }
-    }
-    public void populatePartners(mxGraph graph) {
-        Object parent = graph.getDefaultParent();
-        graph.getModel().beginUpdate();
-
-        try
-        {
-            int v1 = 20;
-            int v2 =50;
-            Object prevCell= null;
-            for (PartnerEntry currentCell:
-                    partnerDB) {
-                //not having toString() causes errors that dont seem to affect the program
-                partnerLabel.setId(Integer.parseInt(currentCell.getId()));
-                Object cell = graph.insertVertex(parent, partnerLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Partner");
-
-                v1+= 50;
-                v2+= 75;
-                nodes.add(currentCell);
-                cellList.add(cell);
-                if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell,"Edge");
-                }
-                prevCell = cell;
-            }
-        }
-        finally
-        {
-            graph.getModel().endUpdate();
-        }
+        String finalSelection =(String) JOptionPane.showInputDialog(graphComponent, "Choose the "+ selection+ " you want to start with.", "Select an option",
+                JOptionPane.QUESTION_MESSAGE,null, targets,targets[0]);
     }
 
     //functions that add the right nodes to the graph based on user request

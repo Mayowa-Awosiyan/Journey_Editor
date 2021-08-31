@@ -125,6 +125,37 @@ public class JourneyDB {
         return cells;
     }
 
+    public ArrayList<String> getNames(String selection){
+        ArrayList<String> names = new ArrayList<>();
+        String query;
+        if(selection.equals("Member")){
+            query = "Select first_name from main_Members";
+        }
+        else if(selection.equals("Event")){
+            query = "Select name_en from main_Event";
+        }
+        else if(selection.equals("Grant")){
+            query = "select title from main_Grants";
+        }
+        else if(selection.equals("Partner")){
+            query = "Select name from main_Partners";
+        }
+        else{
+            query = "Select title from main_Products";
+        }
+        try{
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                names.add(resultSet.getString(1));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return names;
+    }
+
     public String[] getEngAndFrench(String query){
         String[] strings = new String[2];
         try{
