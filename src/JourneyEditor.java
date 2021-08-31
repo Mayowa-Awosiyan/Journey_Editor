@@ -29,7 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.io.mxCodecRegistry;
-import com.mxgraph.io.mxGdCodec;
 import com.mxgraph.io.mxModelCodec;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.layout.mxCompactTreeLayout;
@@ -39,6 +38,7 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.*;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxStylesheet;
+import org.w3c.dom.Document;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -48,7 +48,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -66,8 +65,13 @@ public class JourneyEditor extends JFrame {
     //these 2 integer values help keep track of the currently selected cell for deleting purposes
     private int currX,currY;
     //variable to hold the id of all Data Entries will be very important
-    private ProgressingLabel label;
-    private int customs;
+    private ProgressingLabel memberlabel;
+    private ProgressingLabel grantLabel;
+    private ProgressingLabel eventLabel;
+    private ProgressingLabel productLabel;
+    private ProgressingLabel partnerLabel;
+    private ProgressingLabel customLabel;
+
     private ArrayList<DataEntry> nodes;
 
     private int currLayout;
@@ -93,13 +97,18 @@ public class JourneyEditor extends JFrame {
         //setting the title of the window getting opened by the program
         super("The new goal");
         currLayout= 1;
-        customs= 1;
+
         final mxGraph graph = new mxGraph();
         //create undo manager built in way to manage undo and redo operations
         undoManager = new mxUndoManager();
         currY=0;
         currX=0;
-        label= new ProgressingLabel("Label");
+        memberlabel = new ProgressingLabel("Member");
+        eventLabel = new ProgressingLabel("Event");
+        productLabel = new ProgressingLabel("Product");
+        grantLabel = new ProgressingLabel("Grant");
+        partnerLabel = new ProgressingLabel("Partner");
+        customLabel = new ProgressingLabel("Custom");
         nodes= new ArrayList<>();
         nodes.add(new DataEntry("Graph",null));
         cellList = new ArrayList<>();
@@ -139,6 +148,14 @@ public class JourneyEditor extends JFrame {
         productStyle.put(mxConstants.STYLE_FILLCOLOR, "#0F2080");
         stylesheet.putCellStyle("Product", productStyle);
 
+
+        Hashtable<String,Object> partnerStyle = new Hashtable<>();
+        partnerStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_TRIANGLE);
+        partnerStyle.put(mxConstants.STYLE_FILLCOLOR, "#00FF00");
+        partnerStyle.put(mxConstants.STYLE_FONTCOLOR,"#000000");
+        partnerStyle.put(mxConstants.STYLE_STROKECOLOR,"#00AA00");
+        stylesheet.putCellStyle("Partner", partnerStyle);
+
         Hashtable<String, Object> customStyle = new Hashtable<String, Object>();
         customStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
         customStyle.put(mxConstants.STYLE_OPACITY, 50);
@@ -168,13 +185,13 @@ public class JourneyEditor extends JFrame {
             for (MemberEntry currentCell:
                     journeyDBmembers) {
                 //not having toString() causes errors that dont seem to affect the program
-                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
+                memberlabel.setId(Integer.parseInt(currentCell.getId()));
+                Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
 
                 v1+= 50;
                 v2+= 75;
                 nodes.add(currentCell);
                 cellList.add(cell);
-                label.progress();
                 if(prevCell != null){
                     graph.insertEdge(parent,null, "",prevCell,cell);
                 }
@@ -274,12 +291,12 @@ public class JourneyEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Object parent = graph.getDefaultParent();
-                Object cell = graph.insertVertex(parent, label.toString(), "", getMousePosition(true).getX(),
+                Object cell = graph.insertVertex(parent, memberlabel.toString(), "", getMousePosition(true).getX(),
                         getMousePosition(true).getY(),120, 50,"Custom");
-                label.progress();
+                memberlabel.progress();
 
-                nodes.add(new CustomEntry(null,String.valueOf(customs), ""));
-                customs++;
+                nodes.add(new CustomEntry(null,customLabel.toString(), ""));
+                customLabel.progress();
                 cellList.add(cell);
             }
         });
@@ -425,20 +442,21 @@ public class JourneyEditor extends JFrame {
                     else if(graphComponent.getCellAt(e.getX(),e.getY()) !=null) {
                         currX= e.getX();
                         currY= e.getY();
-                        Object chosen = nodes.get(cellList.indexOf(graphComponent.getCellAt(e.getX(), e.getY()))).getClass();
-                        if(chosen == MemberEntry.class) {
+                        mxCell chosen =(mxCell) graphComponent.getCellAt(e.getX(), e.getY());
+
+                        if(chosen.getStyle().equals("Member")) {
                             memberContext.show(e.getComponent(), e.getX(), e.getY());
                         }
-                        else if(chosen == GrantEntry.class){
+                        else if(chosen.getStyle().equals("Grant")){
                             grantContext.show(e.getComponent(),e.getX(),e.getY());
                         }
-                        else if(chosen == EventEntry.class){
+                        else if(chosen.getStyle().equals("Event")){
                             eventContext.show(e.getComponent(),e.getX(),e.getY());
                         }
-                        else if(chosen == PartnerEntry.class){
+                        else if(chosen.getStyle().equals("Partner")){
                             partnerContext.show(e.getComponent(),e.getX(),e.getY());
                         }
-                        else if(chosen == ProductEntry.class){
+                        else if(chosen.getStyle().equals("Product")){
                             productContext.show(e.getComponent(),e.getX(),e.getY());
                         }
                     }
@@ -931,7 +949,7 @@ public class JourneyEditor extends JFrame {
                         // taken from EditorActions class
                         mxCodec codec = new mxCodec();
                         String xml = mxXmlUtils.getXml(codec.encode(graph.getModel()));
-                        mxUtils.writeFile(xml,filename );
+                        mxUtils.writeFile(xml,filename);
 
                         JOptionPane.showMessageDialog( graphComponent, "File saved to: " + filename);
 
@@ -957,12 +975,15 @@ public class JourneyEditor extends JFrame {
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = jFileChooser.getSelectedFile();
                     try {
-                        byte c;
-                        FileInputStream fileInputStream = new FileInputStream(selectedFile);
-                        while((c = (byte) fileInputStream.read()) != -1){
-                            mxGdCodec.decode(String.valueOf(c),graph);
-                            System.out.println(c);
-                        }
+                        String strXML =
+                                mxUtils.readFile(String.valueOf(selectedFile));
+                        Document xmlGraphDoc = mxXmlUtils.parseXml(strXML);
+                        mxCodec codec = new mxCodec(xmlGraphDoc);
+                        Object o;
+                        o = codec.decode(xmlGraphDoc.getDocumentElement());
+                        graph.setModel((mxGraphModel)o);
+                        mxGraphModel model = (mxGraphModel)graph.getModel();
+
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
                     } catch (IOException ioException) {
@@ -1019,7 +1040,7 @@ public class JourneyEditor extends JFrame {
                 break;
         }
     }
-    //TODO
+    //TODO replace these with a function that only adds one chosen node
     public void populateMembers(mxGraph graph) {
         Object parent = graph.getDefaultParent();
         graph.getModel().beginUpdate();
@@ -1032,13 +1053,13 @@ public class JourneyEditor extends JFrame {
             for (MemberEntry currentCell:
                     journeyDBmembers) {
                 //not having toString() causes errors that dont seem to affect the program
-                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
+                memberlabel.setId(Integer.parseInt(currentCell.getId()));
+                Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
 
                 v1+= 50;
                 v2+= 75;
                 nodes.add(currentCell);
                 cellList.add(cell);
-                label.progress();
                 if(prevCell != null){
                     graph.insertEdge(parent,null, "",prevCell,cell);
                 }
@@ -1062,13 +1083,13 @@ public class JourneyEditor extends JFrame {
             for (GrantEntry currentCell:
                     dBgrants) {
                 //not having toString() causes errors that dont seem to affect the program
-                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
+                grantLabel.setId(Integer.parseInt(currentCell.getId()));
+                Object cell = graph.insertVertex(parent, grantLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
 
                 v1+= 50;
                 v2+= 75;
                 nodes.add(currentCell);
                 cellList.add(cell);
-                label.progress();
                 if(prevCell != null){
                     graph.insertEdge(parent,null, "",prevCell,cell);
                 }
@@ -1092,13 +1113,14 @@ public class JourneyEditor extends JFrame {
             for (ProductEntry currentCell:
                     productDB) {
                 //not having toString() causes errors that dont seem to affect the program
-                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
+                memberlabel.setId(Integer.parseInt(currentCell.getId()));
+                Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
 
                 v1+= 50;
                 v2+= 75;
                 nodes.add(currentCell);
                 cellList.add(cell);
-                label.progress();
+
                 if(prevCell != null){
                     graph.insertEdge(parent,null, "",prevCell,cell);
                 }
@@ -1122,13 +1144,13 @@ public class JourneyEditor extends JFrame {
             for (EventEntry currentCell:
                     eventsDB) {
                 //not having toString() causes errors that dont seem to affect the program
-                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
+                eventLabel.setId(Integer.parseInt(currentCell.getId()));
+                Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
 
                 v1+= 50;
                 v2+= 75;
                 nodes.add(currentCell);
                 cellList.add(cell);
-                label.progress();
                 if(prevCell != null){
                     graph.insertEdge(parent,null, "",prevCell,cell);
                 }
@@ -1152,13 +1174,13 @@ public class JourneyEditor extends JFrame {
             for (PartnerEntry currentCell:
                     partnerDB) {
                 //not having toString() causes errors that dont seem to affect the program
-                Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Partner");
+                partnerLabel.setId(Integer.parseInt(currentCell.getId()));
+                Object cell = graph.insertVertex(parent, partnerLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Partner");
 
                 v1+= 50;
                 v2+= 75;
                 nodes.add(currentCell);
                 cellList.add(cell);
-                label.progress();
                 if(prevCell != null){
                     graph.insertEdge(parent,null, "",prevCell,cell);
                 }
@@ -1184,8 +1206,7 @@ public class JourneyEditor extends JFrame {
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
-            targetID = nodes.get(label.getTarget(targetID)).getId();
-
+            targetID= String.valueOf(eventLabel.getTarget(targetID,role));
             ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_" +role+
                     " where " + targetID+ " = relp_Event_"+ role +"."+role+"_ID and main_events.id = relp_event_"+ role+".Event_id");
             try
@@ -1208,10 +1229,10 @@ public class JourneyEditor extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
+                        eventLabel.setId(Integer.parseInt(currentCell.getId()));
+                        Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        label.progress();
                         nodes.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell);
@@ -1236,7 +1257,7 @@ public class JourneyEditor extends JFrame {
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
-            targetID = nodes.get(label.getTarget(targetID)).getId();
+            targetID= String.valueOf(eventLabel.getTarget(targetID));
 
             ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_Event where "
                     + targetID+ " = relp_Event_Event.past_event_ID and main_events.id = relp_event_Event.future_event_id");
@@ -1264,10 +1285,10 @@ public class JourneyEditor extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
+                        eventLabel.setId(Integer.parseInt(currentCell.getId()));
+                        Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        label.progress();
                         nodes.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "Leads to",addition,cell);
@@ -1292,7 +1313,7 @@ public class JourneyEditor extends JFrame {
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
-            targetID = nodes.get(label.getTarget(targetID)).getId();
+            targetID= String.valueOf(eventLabel.getTarget(targetID));
 
             ArrayList<EventEntry> cells = journeyDB.getEvents("Select * From main_events, relp_Event_Event where "
                     + targetID+ " = relp_Event_Event.future_event_ID and main_events.id = relp_event_Event.past_event_id");
@@ -1321,10 +1342,10 @@ public class JourneyEditor extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
+                        eventLabel.setId(Integer.parseInt(currentCell.getId()));
+                        Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        label.progress();
                         nodes.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "Leads to",cell,addition);
@@ -1349,10 +1370,8 @@ public class JourneyEditor extends JFrame {
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
-            targetID = nodes.get(label.getTarget(targetID)).getId();
-
+            targetID= String.valueOf(grantLabel.getTarget(targetID,role));
             ArrayList<GrantEntry> cells;
-            System.out.println(role.compareTo("Event"));
             if(role.compareTo("Event") == 0){
                cells = journeyDB.getGrants("Select * From main_grants, relp_Event_Grant"+
                         " where " + targetID+ " = relp_Event_Grant.Event_ID and main_grants.id = relp_Event_Grant.grant_id");
@@ -1381,10 +1400,10 @@ public class JourneyEditor extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
+                        grantLabel.setId(Integer.parseInt(currentCell.getId()));
+                        Object cell = graph.insertVertex(parent, grantLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
                         v1+= 50;
                         v2+= 75;
-                        label.progress();
                         nodes.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell);
@@ -1409,7 +1428,7 @@ public class JourneyEditor extends JFrame {
             String targetID =thing.getId();
             //this is the id in the database
             ArrayList<ProductEntry> cells;
-            targetID = nodes.get(label.getTarget(targetID)).getId();
+            targetID= String.valueOf(productLabel.getTarget(targetID,role));
             if(role.compareTo("Event") == 0){
                cells = journeyDB.getProducts("Select * From main_products, relp_Event_product"+
                         " where " + targetID+ " = relp_Event_product.Event_ID and main_products.id = relp_Event_product.product_id");
@@ -1437,10 +1456,10 @@ public class JourneyEditor extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
+                        productLabel.setId(Integer.parseInt(currentCell.getId()));
+                        Object cell = graph.insertVertex(parent, productLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
                         v1+= 50;
                         v2+= 75;
-                        label.progress();
                         nodes.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell);
@@ -1460,7 +1479,7 @@ public class JourneyEditor extends JFrame {
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
-            targetID = nodes.get(label.getTarget(targetID)).getId();
+            targetID= String.valueOf(partnerLabel.getTarget(targetID,role));
             ArrayList<PartnerEntry> cells;
             if(role.compareTo("Member") == 0){
                 cells = journeyDB.getPartners("Select * From main_partners, relp_Partner_member"+
@@ -1490,10 +1509,10 @@ public class JourneyEditor extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"TRIANGLE;strokeColor=#000000;fillColor=grey");
+                        partnerLabel.setId(Integer.parseInt(currentCell.getId()));
+                        Object cell = graph.insertVertex(parent, partnerLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Partner");
                         v1+= 50;
                         v2+= 75;
-                        label.progress();
                         nodes.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell);
@@ -1517,7 +1536,7 @@ public class JourneyEditor extends JFrame {
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
-            targetID = nodes.get(label.getTarget(targetID)).getId();
+            targetID= String.valueOf(memberlabel.getTarget(targetID,role));
             ArrayList<MemberEntry> cells = journeyDB.getMembers("Select * From main_members, relp_"+role+"_member " +
                     "where " + targetID+ " = relp_"+role+"_member."+role+"_ID and main_members.id = relp_"+ role+"_member.Member_id");
             try
@@ -1527,9 +1546,7 @@ public class JourneyEditor extends JFrame {
 
                 for (MemberEntry currentCell:
                         cells) {
-
                     if(nodes.contains(currentCell)){
-
                         int target =nodes.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
@@ -1540,10 +1557,10 @@ public class JourneyEditor extends JFrame {
                         }
                     }
                     else {
-                        Object cell = graph.insertVertex(parent, label.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
+                        memberlabel.setId(Integer.parseInt(currentCell.getId()));
+                        Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
                         v1+= 50;
                         v2+= 75;
-                        label.progress();
                         nodes.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",cell,addition);
@@ -1664,7 +1681,6 @@ public class JourneyEditor extends JFrame {
         frame.setSize(700, 620);
         //makes the window visible
         frame.setVisible(true);
-
 
         //5-6 colorblind friendly colors
         //5-6 shapes for different types (member, event, etc.)
