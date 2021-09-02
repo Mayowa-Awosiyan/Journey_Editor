@@ -10,7 +10,7 @@ public class JourneyDB {
 
     public JourneyDB(String point) throws SQLException {
         this.url = point;
-        connection = DriverManager.getConnection(url);
+        connection = DriverManager.getConnection("jdbc:ucanaccess://"+url);
     }
 
     public JourneyDB() throws SQLException {

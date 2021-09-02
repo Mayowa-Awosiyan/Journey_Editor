@@ -42,6 +42,7 @@ import org.w3c.dom.Document;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.undo.UndoableEdit;
 import java.awt.*;
@@ -83,7 +84,7 @@ public class JourneyEditor extends JFrame {
     private ArrayList<ProductEntry> productDB;
 
 
-    JourneyDB journeyDB;
+    private JourneyDB journeyDB;
     //setting up undohandler that will keep track of edits
     protected mxEventSource.mxIEventListener undoHandler = new mxEventSource.mxIEventListener() {
         @Override
@@ -115,6 +116,14 @@ public class JourneyEditor extends JFrame {
         cellList.add("Start Point");
 
 
+        //getting the location of the database from the user
+        JFileChooser file= new JFileChooser();
+        file.setDialogTitle("Please select the database");
+        file.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Microsoft Access","accdb");
+        file.setFileFilter(filter);
+        file.showOpenDialog(null);
+        String location = file.getSelectedFile().getName();
 
         //Stylesheets that give nodes representing different data types different appearances
         //member stylesheet
@@ -164,12 +173,8 @@ public class JourneyEditor extends JFrame {
         customStyle.put(mxConstants.STYLE_STROKECOLOR, "#FFFF00");
         stylesheet.putCellStyle("Custom", customStyle);
 
-        journeyDB= new JourneyDB();
-        journeyDBmembers = journeyDB.getMembers("Select * From main_members");
-        dBgrants = journeyDB.getGrants("select * from main_grants");
-        eventsDB = journeyDB.getEvents("select * from main_events");
-        partnerDB = journeyDB.getPartners("select * from main_partners");
-        productDB = journeyDB.getProducts("Select * from main_products");
+        journeyDB= new JourneyDB(location);
+
 
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         getContentPane().add(graphComponent);
@@ -179,24 +184,7 @@ public class JourneyEditor extends JFrame {
 
         try
         {
-            int v1 = 20;
-            int v2 =50;
-            Object prevCell= null;
-            for (MemberEntry currentCell:
-                    journeyDBmembers) {
-                //not having toString() causes errors that dont seem to affect the program
-                memberlabel.setId(Integer.parseInt(currentCell.getId()));
-                Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
-
-                v1+= 50;
-                v2+= 75;
-                nodes.add(currentCell);
-                cellList.add(cell);
-                if(prevCell != null){
-                    graph.insertEdge(parent,null, "",prevCell,cell);
-                }
-                prevCell = cell;
-            }
+            startGraph(graph,graphComponent);
         }
         finally
         {
@@ -314,9 +302,7 @@ public class JourneyEditor extends JFrame {
                 graph.removeCells(var);
                 Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
                 if(vertices.length ==0){
-                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
-                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
-                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    startGraph(graph, graphComponent);
                 }
             }
         });
@@ -332,9 +318,7 @@ public class JourneyEditor extends JFrame {
                 graph.removeCells(var);
                 Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
                 if(vertices.length ==0){
-                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
-                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
-                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    startGraph(graph,graphComponent);
                 }
             }
         });
@@ -350,9 +334,7 @@ public class JourneyEditor extends JFrame {
                 graph.removeCells(var);
                 Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
                 if(vertices.length ==0){
-                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
-                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
-                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    startGraph(graph,graphComponent);
                 }
             }
         });
@@ -369,9 +351,7 @@ public class JourneyEditor extends JFrame {
                 graph.removeCells(var);
                 Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
                 if(vertices.length ==0){
-                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
-                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
-                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    startGraph(graph,graphComponent);
                 }
             }
         });
@@ -388,9 +368,7 @@ public class JourneyEditor extends JFrame {
                 graph.removeCells(var);
                 Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
                 if(vertices.length ==0){
-                    String[] choices =new String[] {"Members", "Products", "Grants","Partners","Events"};
-                    String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
-                            JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+                    startGraph(graph,graphComponent);
                 }
             }
         });
@@ -403,6 +381,7 @@ public class JourneyEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
+                startGraph(graph, graphComponent);
             }
         });
         voidContext.add(menuItem);
@@ -662,6 +641,17 @@ public class JourneyEditor extends JFrame {
         });
         partnerContext.add(menuItem);
 
+        menuItem = new JMenuItem("Show Events");
+        menuItem.setMnemonic(KeyEvent.VK_E);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphEvents(graph,"Grant");
+            }
+        });
+        grantContext.add(menuItem);
+
         menuItem = new JMenuItem("Show Future Events");
         menuItem.setMnemonic(KeyEvent.VK_F);
         menuItem.getAccessibleContext().setAccessibleDescription("Show Future Events");
@@ -811,6 +801,17 @@ public class JourneyEditor extends JFrame {
             }
         });
         eventContext.add(menuItem);
+
+        menuItem = new JMenuItem("Show Partners");
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Partners");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphPartners(graph, "Product");
+            }
+        });
+        productContext.add(menuItem);
 
         menuItem = new JMenuItem("Show Grants");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -967,7 +968,7 @@ public class JourneyEditor extends JFrame {
         voidContext.add(menuItem);
     }
 
-    public void startGraph(mxGraph graph, mxGraphComponent graphComponent, String selected){
+    public void startGraph(mxGraph graph, mxGraphComponent graphComponent){
 
         String[] choices =new String[] {"Member", "Product", "Grant","Partner","Event"};
         String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
@@ -979,6 +980,32 @@ public class JourneyEditor extends JFrame {
         }
         String finalSelection =(String) JOptionPane.showInputDialog(graphComponent, "Choose the "+ selection+ " you want to start with.", "Select an option",
                 JOptionPane.QUESTION_MESSAGE,null, targets,targets[0]);
+        String query;
+        if(selection.equals("Member")){
+            MemberEntry start = journeyDB.getMembers("Select * from main_members where main_members.first_name = '" + finalSelection+"'").get(0);
+            memberlabel.setId(Integer.parseInt(start.getId()));
+            Object thing = graph.insertVertex(graph.getDefaultParent(),memberlabel.toString(), start.toString(),80,60,120, 50, "Member");
+        }
+        else if(selection.equals("Event")){
+            EventEntry start = journeyDB.getEvents("Select * from main_events where name_en = '" +finalSelection + "'").get(0);
+            eventLabel.setId(Integer.parseInt(start.getId()));
+            Object thing = graph.insertVertex(graph.getDefaultParent(),eventLabel.toString(), start.toString(),80,60,120, 50, "Event");
+        }
+        else if(selection.equals("Grant")){
+            GrantEntry start = journeyDB.getGrants("Select * from main_grants where title = '"+ finalSelection+"'").get(0);
+            grantLabel.setId(Integer.parseInt(start.getId()));
+            Object thing = graph.insertVertex(graph.getDefaultParent(),grantLabel.toString(), start.toString(),80,60,120, 50, "Grant");
+        }
+        else if(selection.equals("Partner")){
+            PartnerEntry start = journeyDB.getPartners("Select * from main_partners where name = '"+ finalSelection+"'").get(0);
+            partnerLabel.setId(Integer.parseInt(start.getId()));
+            Object thing = graph.insertVertex(graph.getDefaultParent(),partnerLabel.toString(), start.toString(),80,60,120, 50, "Partner");
+        }
+        else{
+            ProductEntry start = journeyDB.getProducts("Select * from main_products where title = '"+ finalSelection+"'").get(0);
+            productLabel.setId(Integer.parseInt(start.getId()));
+            Object thing = graph.insertVertex(graph.getDefaultParent(),productLabel.toString(), start.toString(),80,60,120, 50, "Product");
+        }
     }
 
     //functions that add the right nodes to the graph based on user request
@@ -1176,9 +1203,21 @@ public class JourneyEditor extends JFrame {
 
                 for (GrantEntry currentCell:
                         cells) {
-
                     if(nodes.contains(currentCell)){
+
                         int target =nodes.indexOf(currentCell);
+                        //wont create new edges that are identical to existing ones
+                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
+                            ;
+                        }
+                        //wont loop to itself
+                        else if(cellList.get(target).equals(addition)){
+                            ;
+                        }
+                        else {
+                            graph.insertEdge(parent,null,"",cellList.get(target),addition,"Edge");
+
+                        }
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
@@ -1360,7 +1399,7 @@ public class JourneyEditor extends JFrame {
             }
         }
     }
-    //function to display requested info
+    //todo update functionality
     public void displayInfo(mxGraph graph,int choice){
         int count = 0;
 
@@ -1444,16 +1483,17 @@ public class JourneyEditor extends JFrame {
     //Early testing to get used to all the new functions I will be using as part of this project
     public static void main(String[] args) throws SQLException {
 
-        //todo change dialog box to put one element of user's choosing
+
         //todo ask user for location of database
         //todo look into .bat file to save db name
         //todo rework starting graph to be one selectable node
-        //todo rework labelling
         //todo event missing relations
         //todo flip between english and french
-        JFileChooser file;
+
         JourneyEditor frame = new JourneyEditor();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
 
         /*
         if(args.length == 1)
