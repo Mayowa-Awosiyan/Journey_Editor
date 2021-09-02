@@ -73,7 +73,7 @@ public class JourneyEditor extends JFrame {
     private ProgressingLabel partnerLabel;
     private ProgressingLabel customLabel;
 
-    private ArrayList<DataEntry> nodes;
+    private ArrayList<DataEntry> entries;
 
     private int currLayout;
     private ArrayList<Object> cellList;
@@ -110,8 +110,8 @@ public class JourneyEditor extends JFrame {
         grantLabel = new ProgressingLabel("Grant");
         partnerLabel = new ProgressingLabel("Partner");
         customLabel = new ProgressingLabel("Custom");
-        nodes= new ArrayList<>();
-        nodes.add(new DataEntry("Graph",null));
+        entries = new ArrayList<>();
+        entries.add(new DataEntry("Graph",null));
         cellList = new ArrayList<>();
         cellList.add("Start Point");
 
@@ -175,6 +175,32 @@ public class JourneyEditor extends JFrame {
 
         journeyDB= new JourneyDB(location);
 
+        journeyDBmembers = journeyDB.getMembers("Select * from main_members");
+        dBgrants = journeyDB.getGrants("Select * from main_grants");
+        eventsDB = journeyDB.getEvents("Select * from main_events");
+        partnerDB = journeyDB.getPartners("Select * from main_partners");
+        productDB = journeyDB.getProducts("Select * from main_products");
+
+        for (MemberEntry entry:
+             journeyDBmembers) {
+            entries.add(entry);
+        }
+        for (GrantEntry entry:
+                dBgrants) {
+            entries.add(entry);
+        }
+        for (ProductEntry entry:
+                productDB) {
+            entries.add(entry);
+        }
+        for (PartnerEntry entry:
+                partnerDB) {
+            entries.add(entry);
+        }
+        for (EventEntry entry:
+                eventsDB) {
+            entries.add(entry);
+        }
 
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         getContentPane().add(graphComponent);
@@ -283,7 +309,7 @@ public class JourneyEditor extends JFrame {
                         getMousePosition(true).getY(),120, 50,"Custom");
                 memberlabel.progress();
 
-                nodes.add(new CustomEntry(null,customLabel.toString(), ""));
+                entries.add(new CustomEntry(null,customLabel.toString(), ""));
                 customLabel.progress();
                 cellList.add(cell);
             }
@@ -916,22 +942,18 @@ public class JourneyEditor extends JFrame {
                     String filename=fileToSave.getAbsolutePath().toString();
                     mxCodecRegistry.register(new mxModelCodec( new mxGraphModel()));
                     try {
-
                         mxGraph graph = graphComponent.getGraph();
                         // taken from EditorActions class
                         mxCodec codec = new mxCodec();
                         String xml = mxXmlUtils.getXml(codec.encode(graph.getModel()));
                         mxUtils.writeFile(xml,filename);
-
                         JOptionPane.showMessageDialog( graphComponent, "File saved to: " + filename);
-
                     } catch( Exception ex) {
                         throw new RuntimeException( ex);
                     }
                 }
             }
         });
-
         voidContext.add(menuItem);
 
         menuItem = new JMenuItem("Load Journey");
@@ -1032,9 +1054,9 @@ public class JourneyEditor extends JFrame {
                 for (EventEntry currentCell:
                         cells) {
 
-                    if(nodes.contains(currentCell)){
+                    if(entries.contains(currentCell)){
 
-                        int target =nodes.indexOf(currentCell);
+                        int target = entries.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
@@ -1048,7 +1070,7 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        nodes.add(currentCell);
+                        entries.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell,"Edge");
 
@@ -1084,9 +1106,9 @@ public class JourneyEditor extends JFrame {
                 for (EventEntry currentCell:
                         cells) {
 
-                    if(nodes.contains(currentCell)){
+                    if(entries.contains(currentCell)){
 
-                        int target =nodes.indexOf(currentCell);
+                        int target = entries.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
@@ -1104,7 +1126,7 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        nodes.add(currentCell);
+                        entries.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "Leads to",addition,cell,"Edge");
 
@@ -1140,9 +1162,9 @@ public class JourneyEditor extends JFrame {
                 for (EventEntry currentCell:
                         cells) {
 
-                    if(nodes.contains(currentCell)){
+                    if(entries.contains(currentCell)){
 
-                        int target =nodes.indexOf(currentCell);
+                        int target = entries.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
@@ -1161,7 +1183,7 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        nodes.add(currentCell);
+                        entries.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "Leads to",cell,addition,"Edge");
 
@@ -1203,9 +1225,9 @@ public class JourneyEditor extends JFrame {
 
                 for (GrantEntry currentCell:
                         cells) {
-                    if(nodes.contains(currentCell)){
+                    if(entries.contains(currentCell)){
 
-                        int target =nodes.indexOf(currentCell);
+                        int target = entries.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
@@ -1231,7 +1253,7 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, grantLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
                         v1+= 50;
                         v2+= 75;
-                        nodes.add(currentCell);
+                        entries.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell,"Edge");
 
@@ -1272,8 +1294,8 @@ public class JourneyEditor extends JFrame {
                 for (ProductEntry currentCell:
                         cells) {
 
-                    if(nodes.contains(currentCell)){
-                        int target =nodes.indexOf(currentCell);
+                    if(entries.contains(currentCell)){
+                        int target = entries.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
@@ -1287,7 +1309,7 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, productLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
                         v1+= 50;
                         v2+= 75;
-                        nodes.add(currentCell);
+                        entries.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell,"Edge");
                     }
@@ -1325,8 +1347,8 @@ public class JourneyEditor extends JFrame {
                 for (PartnerEntry currentCell:
                         cells) {
 
-                    if(nodes.contains(currentCell)){
-                        int target =nodes.indexOf(currentCell);
+                    if(entries.contains(currentCell)){
+                        int target = entries.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         //todo change color of 2nd and onward edges
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
@@ -1341,7 +1363,7 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, partnerLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Partner");
                         v1+= 50;
                         v2+= 75;
-                        nodes.add(currentCell);
+                        entries.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell,"Edge");
                     }
@@ -1374,8 +1396,8 @@ public class JourneyEditor extends JFrame {
 
                 for (MemberEntry currentCell:
                         cells) {
-                    if(nodes.contains(currentCell)){
-                        int target =nodes.indexOf(currentCell);
+                    if(entries.contains(currentCell)){
+                        int target = entries.indexOf(currentCell);
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
                             ;
@@ -1389,7 +1411,7 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
                         v1+= 50;
                         v2+= 75;
-                        nodes.add(currentCell);
+                        entries.add(currentCell);
                         cellList.add(cell);
                         graph.insertEdge(parent,null, "",cell,addition,"Edge");
                     }
@@ -1400,13 +1422,12 @@ public class JourneyEditor extends JFrame {
         }
     }
     //todo update functionality
-    public void displayInfo(mxGraph graph,int choice){
+    public void displayInfo(mxGraph graph,int choice) {
+
         int count = 0;
-
-        for (DataEntry currNode:
-                nodes) {
-
-            switch (choice){
+        Object[] vertices = graph.getChildVertices(graph.getDefaultParent());
+        for (DataEntry currNode : entries) {
+            switch (choice) {
                 case 0:
                     currNode.toggleDate();
                     break;
@@ -1458,38 +1479,89 @@ public class JourneyEditor extends JFrame {
                 case 16:
                     currNode.toggleTheme();
             }
-        }
-        int index =1;
-        for(Object target : graph.getChildVertices(graph.getDefaultParent())){
-            //prevents the contents of custom nodes from being deleted
-            if(((mxCell) target).getStyle().equals("Custom")){
-                int pointer = cellList.indexOf(target);
-                nodes.get(pointer).setContent(String.valueOf(((mxCell) target).getValue()));
+
+            int index = 1;
+            for (Object target : graph.getChildVertices(graph.getDefaultParent())) {
+                //prevents the contents of custom nodes from being deleted
+                ((mxCell) target).setValue(updateDates(target));
+
+                //change the size of cells based off of how many lines
+                count = target.toString().split("\r\n|\r|\n").length - 1;
+                ((mxCell) target).getGeometry().setHeight(50 + 7 * count);
+                index++;
             }
-            ((mxCell) target).setValue(nodes.get(index).toString());
-
-            //change the size of cells based off of how many lines
-            count = target.toString().split("\r\n|\r|\n").length -1;
-            ((mxCell) target).getGeometry().setHeight(50 + 7*count);
-
-            index++;
+            graph.refresh();
         }
-        graph.refresh();
     }
 
-
-
+    private String updateDates(Object vertex) {
+        mxCell point = (mxCell) vertex;
+        String id = String.valueOf(memberlabel.getTarget(point.getId(),point.getStyle()));
+        if(point.getStyle().equals("Member")){
+            for (MemberEntry member:
+                 journeyDBmembers) {
+                if(member.getId().equals(id)){
+                    //member.toggleDate();
+                    return member.toString();
+                }
+            }
+        }
+        else if(point.getStyle().equals("Event")){
+            for (EventEntry member:
+                    eventsDB) {
+                if(member.getId().equals(id)){
+                    //member.toggleDate();
+                    return member.toString();
+                }
+            }
+        }
+        else if(point.getStyle().equals("Product")){
+            for (ProductEntry member:
+                    productDB) {
+                if(member.getId().equals(id)){
+                    //member.toggleDate();
+                    return member.toString();
+                }
+            }
+        }
+        else if(point.getStyle().equals("Parnter")){
+            for (PartnerEntry member:
+                    partnerDB) {
+                if(member.getId().equals(id)){
+                    //member.toggleDate();
+                    return member.toString();
+                }
+            }
+        }
+        else if(point.getStyle().equals("Grant")){
+            for (GrantEntry member:
+                    dBgrants) {
+                if(member.getId().equals(id)){
+                    //member.toggleDate();
+                    return member.toString();
+                }
+            }
+        }
+        return String.valueOf(((mxCell) vertex).getValue());
+    }
 
     //Early testing to get used to all the new functions I will be using as part of this project
     public static void main(String[] args) throws SQLException {
 
 
-        //todo ask user for location of database
+
         //todo look into .bat file to save db name
-        //todo rework starting graph to be one selectable node
-        //todo event missing relations
+
         //todo flip between english and french
 
+        //todo adjust how database file is found
+        //todo prevent moving of edges
+        //todo warning on missing elements on loading
+        //todo fix undo/redo post loading
+        //todo fix node's content being overridden by other nodes
+        //todo look into having classes put in a JAR file for
+        //todo check dates of elements to decide arrow direction
+        //todo fix starting on event bug
         JourneyEditor frame = new JourneyEditor();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -1511,8 +1583,6 @@ public class JourneyEditor extends JFrame {
         //makes the window visible
         frame.setVisible(true);
 
-        //5-6 colorblind friendly colors
-        //5-6 shapes for different types (member, event, etc.)
         //create edge context menu to create color based paths
 
         //look into serialization for saving/exporting/loading
