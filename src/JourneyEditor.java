@@ -667,17 +667,6 @@ public class JourneyEditor extends JFrame {
         });
         partnerContext.add(menuItem);
 
-        menuItem = new JMenuItem("Show Events");
-        menuItem.setMnemonic(KeyEvent.VK_E);
-        menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateGraphEvents(graph,"Grant");
-            }
-        });
-        grantContext.add(menuItem);
-
         menuItem = new JMenuItem("Show Future Events");
         menuItem.setMnemonic(KeyEvent.VK_F);
         menuItem.getAccessibleContext().setAccessibleDescription("Show Future Events");
@@ -748,17 +737,7 @@ public class JourneyEditor extends JFrame {
         });
         eventContext.add(menuItem);
 
-        menuItem = new JMenuItem("Show Events");
-        menuItem.setMnemonic(KeyEvent.VK_P);
-        menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateGraphEvents(graph,"Grant");
 
-            }
-        });
-        grantContext.add(menuItem);
         menuItem = new JMenuItem("Show Events");
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
@@ -884,6 +863,17 @@ public class JourneyEditor extends JFrame {
         });
         grantContext.add(menuItem);
 
+        menuItem = new JMenuItem("Show Events");
+        menuItem.setMnemonic(KeyEvent.VK_E);
+        menuItem.getAccessibleContext().setAccessibleDescription("Show Events");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateGraphEvents(graph,"Grant");
+            }
+        });
+        grantContext.add(menuItem);
+
         menuItem = new JMenuItem("Show Members");
         menuItem.setMnemonic(KeyEvent.VK_M);
         menuItem.getAccessibleContext().setAccessibleDescription("Show Members");
@@ -977,6 +967,9 @@ public class JourneyEditor extends JFrame {
                         o = codec.decode(xmlGraphDoc.getDocumentElement());
                         graph.setModel((mxGraphModel)o);
                         mxGraphModel model = (mxGraphModel)graph.getModel();
+                        undoManager.clear();
+                        graph.addListener("UndoManager", undoHandler);
+                        model.addListener("UndoManager",undoHandler);
 
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
@@ -1034,7 +1027,7 @@ public class JourneyEditor extends JFrame {
     public void updateGraphEvents(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1079,12 +1072,13 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
+        graph.getModel().endUpdate();
     }
 
     public void updateGraphNextEvents(mxGraph graph){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1141,6 +1135,7 @@ public class JourneyEditor extends JFrame {
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
 
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1192,12 +1187,14 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
+        graph.getModel().endUpdate();
     }
 
     public void updateGraphGrants(mxGraph graph, String role){
 
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1221,7 +1218,6 @@ public class JourneyEditor extends JFrame {
             {
                 int v1 = 200;
                 int v2 =50;
-
                 for (GrantEntry currentCell:
                         cells) {
                     grantLabel.setId(Integer.parseInt(currentCell.getId()));
@@ -1249,7 +1245,10 @@ public class JourneyEditor extends JFrame {
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
+
+
         }
+        graph.getModel().endUpdate();
     }
 
     public void updateGraphProducts(mxGraph graph, String role){
@@ -1310,6 +1309,7 @@ public class JourneyEditor extends JFrame {
     public void updateGraphPartners(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             mxCell thing = (mxCell) addition;
             //this is the id of the node
@@ -1358,12 +1358,13 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
+        graph.getModel().endUpdate();
     }
 
     public void updateGraphMembers(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-
+        graph.getModel().endUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1407,6 +1408,7 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
+        graph.getModel().endUpdate();
     }
     //todo update functionality
     public void displayInfo(mxGraph graph,int choice) {
