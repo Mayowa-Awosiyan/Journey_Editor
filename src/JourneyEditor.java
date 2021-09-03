@@ -204,7 +204,6 @@ public class JourneyEditor extends JFrame {
 
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         getContentPane().add(graphComponent);
-
         Object parent = graph.getDefaultParent();
         graph.getModel().beginUpdate();
 
@@ -973,6 +972,12 @@ public class JourneyEditor extends JFrame {
 
                         undoManager.clear();
 
+                        mxEventSource.mxIEventListener undoHandler = new mxEventSource.mxIEventListener() {
+                            @Override
+                            public void invoke(Object o, mxEventObject mxEventObject) {
+                                undoManager.undoableEditHappened((mxUndoableEdit) mxEventObject.getProperty("edit"));
+                            }
+                        };
                         undoManager = new mxUndoManager();
                         graph.addListener(mxEvent.UNDO,undoHandler);
                         graph.getModel().addListener(mxEvent.UNDO, undoHandler);
