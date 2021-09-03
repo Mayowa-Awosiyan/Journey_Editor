@@ -279,19 +279,23 @@ public class JourneyEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(currLayout == 1){
                     currLayout+=1;
+
                     mxHierarchicalLayout mxHierarchicalLayout = new mxHierarchicalLayout(graph);
                     //makes layout easier to follow when complexity rises
                     mxHierarchicalLayout.setFineTuning(true);
                     mxHierarchicalLayout.setInterHierarchySpacing(40);
                     mxHierarchicalLayout.setParallelEdgeSpacing(30);
                     mxHierarchicalLayout.execute(graph.getDefaultParent());
+
                 }
                 else if(currLayout ==2){
                     currLayout=1;
+
                     mxCompactTreeLayout mxCompactTreeLayout = new mxCompactTreeLayout(graph);
                     mxCompactTreeLayout.setNodeDistance(30);
                     mxCompactTreeLayout.setGroupPadding(30);
                     mxCompactTreeLayout.execute(graph.getDefaultParent());
+
                 }
             }
         });
@@ -311,7 +315,6 @@ public class JourneyEditor extends JFrame {
 
                 entries.add(new CustomEntry(null,customLabel.toString(), ""));
                 customLabel.progress();
-                cellList.add(cell);
             }
         });
         voidContext.add(menuItem);
@@ -967,9 +970,25 @@ public class JourneyEditor extends JFrame {
                         o = codec.decode(xmlGraphDoc.getDocumentElement());
                         graph.setModel((mxGraphModel)o);
                         mxGraphModel model = (mxGraphModel)graph.getModel();
+
                         undoManager.clear();
-                        graph.addListener("UndoManager", undoHandler);
-                        model.addListener("UndoManager",undoHandler);
+
+                        undoManager = new mxUndoManager();
+                        graph.addListener(mxEvent.UNDO,undoHandler);
+                        graph.getModel().addListener(mxEvent.UNDO, undoHandler);
+                        graph.getView().addListener(mxEvent.UNDO, undoHandler);
+                        undoHandler = new mxEventSource.mxIEventListener() {
+                            @Override
+                            public void invoke(Object o, mxEventObject mxEventObject) {
+                                //undoManager.undoableEditHappened((mxUndoableEdit) mxEventObject.getProperty("edit"));
+                                List<mxUndoableEdit.mxUndoableChange> changes = ((mxUndoableEdit) mxEventObject.getProperty("edit")).getChanges();
+                                graph.setSelectionCells(graph.getSelectionCellsForChanges(changes));
+                            }
+                        };
+
+                        undoManager.addListener(mxEvent.UNDO, undoHandler);
+                        undoManager.addListener(mxEvent.REDO,undoHandler);
+
 
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
@@ -1027,7 +1046,7 @@ public class JourneyEditor extends JFrame {
     public void updateGraphEvents(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-        graph.getModel().beginUpdate();
+
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1062,23 +1081,22 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        entries.add(currentCell);
-                        cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell,"Edge");
 
                     }
                 }
+
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
-        graph.getModel().endUpdate();
+
     }
 
     public void updateGraphNextEvents(mxGraph graph){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-        graph.getModel().beginUpdate();
+
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1098,33 +1116,26 @@ public class JourneyEditor extends JFrame {
 
                 for (EventEntry currentCell:
                         cells) {
-
-                    if(entries.contains(currentCell)){
-
-                        int target = entries.indexOf(currentCell);
+                    eventLabel.setId(Integer.parseInt(currentCell.getId()));
+                    if(graphContains(graph, eventLabel.toString())){
+                        //gets the preexisting node
+                        Object target = getNode(graph, eventLabel.toString());
                         //wont create new edges that are identical to existing ones
-                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
-                            ;
-                        }
-                        //wont loop to itself
-                        else if(cellList.get(target).equals(addition)){
+                        if(graph.getEdgesBetween(addition,target).length > 0){
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"Leads to",cellList.get(target),addition,"Edge");
+                            graph.insertEdge(parent,null,"",addition,target,"Edge");
                         }
                     }
                     else {
-                        eventLabel.setId(Integer.parseInt(currentCell.getId()));
                         Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        entries.add(currentCell);
-                        cellList.add(cell);
                         graph.insertEdge(parent,null, "Leads to",addition,cell,"Edge");
-
                     }
                 }
+
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -1135,7 +1146,7 @@ public class JourneyEditor extends JFrame {
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
 
-        graph.getModel().beginUpdate();
+
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1155,21 +1166,16 @@ public class JourneyEditor extends JFrame {
 
                 for (EventEntry currentCell:
                         cells) {
-
-                    if(entries.contains(currentCell)){
-
-                        int target = entries.indexOf(currentCell);
+                    eventLabel.setId(Integer.parseInt(currentCell.getId()));
+                    if(graphContains(graph, eventLabel.toString())){
+                        //gets the preexisting node
+                        Object target = getNode(graph, eventLabel.toString());
                         //wont create new edges that are identical to existing ones
-                        if(graph.getEdgesBetween(addition,cellList.get(target)).length > 0){
-                            ;
-                        }
-                        //wont loop to itself
-                        else if(cellList.get(target).equals(addition)){
+                        if(graph.getEdgesBetween(addition,target).length > 0){
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",cellList.get(target),addition,"Edge");
-
+                            graph.insertEdge(parent,null,"",addition,target,"Edge");
                         }
                     }
                     else {
@@ -1177,24 +1183,21 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        entries.add(currentCell);
-                        cellList.add(cell);
                         graph.insertEdge(parent,null, "Leads to",cell,addition,"Edge");
-
                     }
                 }
+
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
-        graph.getModel().endUpdate();
     }
 
     public void updateGraphGrants(mxGraph graph, String role){
 
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-        graph.getModel().beginUpdate();
+
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1218,6 +1221,7 @@ public class JourneyEditor extends JFrame {
             {
                 int v1 = 200;
                 int v2 =50;
+
                 for (GrantEntry currentCell:
                         cells) {
                     grantLabel.setId(Integer.parseInt(currentCell.getId()));
@@ -1236,24 +1240,23 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, grantLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Grant");
                         v1+= 50;
                         v2+= 75;
-                        entries.add(currentCell);
-                        cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell,"Edge");
-
                     }
                 }
+
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
 
 
         }
-        graph.getModel().endUpdate();
+
     }
 
     public void updateGraphProducts(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
+
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1295,28 +1298,27 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, productLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
                         v1+= 50;
                         v2+= 75;
-                        entries.add(currentCell);
-                        cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell,"Edge");
                     }
                 }
+
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
+
     }
 
     public void updateGraphPartners(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-        graph.getModel().beginUpdate();
+
         for(Object addition : targets){
             mxCell thing = (mxCell) addition;
             //this is the id of the node
             String targetID =thing.getId();
             //this is the id in the database
             targetID= String.valueOf(partnerLabel.getTarget(targetID,role));
-            System.out.println(targetID);
             ArrayList<PartnerEntry> cells;
             if(role.compareTo("Member") == 0){
                 cells = journeyDB.getPartners("Select * From main_partners, relp_Partner_member"+
@@ -1349,22 +1351,21 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, partnerLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Partner");
                         v1+= 50;
                         v2+= 75;
-                        entries.add(currentCell);
-                        cellList.add(cell);
                         graph.insertEdge(parent,null, "",addition,cell,"Edge");
                     }
                 }
+
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
-        graph.getModel().endUpdate();
+
     }
 
     public void updateGraphMembers(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-        graph.getModel().endUpdate();
+
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1399,16 +1400,14 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, memberlabel.toString(), currentCell.toString(),v1,v2,120, 50,"Member");
                         v1+= 50;
                         v2+= 75;
-                        entries.add(currentCell);
-                        cellList.add(cell);
                         graph.insertEdge(parent,null, "",cell,addition,"Edge");
                     }
                 }
+
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
-        graph.getModel().endUpdate();
     }
     //todo update functionality
     public void displayInfo(mxGraph graph,int choice) {
