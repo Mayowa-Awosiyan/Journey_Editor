@@ -1087,7 +1087,7 @@ public class JourneyEditor extends JFrame {
     public void updateGraphEvents(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-
+        graph.getModel().beginUpdate();
         for(Object startpoint : targets){
             if(((mxCell) startpoint).isEdge()){
                 continue;
@@ -1137,13 +1137,14 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
+        graph.getModel().endUpdate();
 
     }
 
     public void updateGraphNextEvents(mxGraph graph){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1187,13 +1188,14 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
+        graph.getModel().endUpdate();
     }
 
     public void updateGraphPastEvents(mxGraph graph){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
 
-
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1238,13 +1240,14 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
+        graph.getModel().endUpdate();
     }
 
     public void updateGraphGrants(mxGraph graph, String role){
 
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1301,9 +1304,8 @@ public class JourneyEditor extends JFrame {
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
-
-
         }
+        graph.getModel().endUpdate();
 
     }
 
@@ -1311,6 +1313,7 @@ public class JourneyEditor extends JFrame {
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
 
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1360,13 +1363,13 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
-
+        graph.getModel().endUpdate();
     }
 
     public void updateGraphPartners(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             mxCell thing = (mxCell) addition;
             //this is the id of the node
@@ -1413,13 +1416,13 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
-
+        graph.getModel().endUpdate();
     }
 
     public void updateGraphMembers(mxGraph graph, String role){
         Object parent = graph.getDefaultParent();
         Object[] targets = graph.getSelectionCells();
-
+        graph.getModel().beginUpdate();
         for(Object addition : targets){
             if(((mxCell) addition).isEdge()){
                 continue;
@@ -1469,6 +1472,7 @@ public class JourneyEditor extends JFrame {
                 exception.printStackTrace();
             }
         }
+        graph.getModel().endUpdate();
     }
 
     public void displayInfo(mxGraph graph,int choice) {
@@ -1530,6 +1534,7 @@ public class JourneyEditor extends JFrame {
             }
 
             int index = 1;
+
             for (Object target : graph.getChildVertices(graph.getDefaultParent())) {
                 //prevents the contents of custom nodes from being deleted
                 ((mxCell) target).setValue(updateDates(target));
