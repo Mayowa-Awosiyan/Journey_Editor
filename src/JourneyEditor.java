@@ -31,7 +31,7 @@ import com.mxgraph.io.mxCodec;
 import com.mxgraph.io.mxCodecRegistry;
 import com.mxgraph.io.mxModelCodec;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.layout.mxFastOrganicLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
@@ -77,7 +77,7 @@ public class JourneyEditor extends JFrame {
 
     private ArrayList<DataEntry> entries;
 
-    private int currLayout;
+    private boolean currLayout;
     private ArrayList<Object> cellList;
     private ArrayList<MemberEntry> journeyDBmembers;
     private ArrayList<GrantEntry> dBgrants;
@@ -99,7 +99,7 @@ public class JourneyEditor extends JFrame {
     public JourneyEditor() throws SQLException {
         //setting the title of the window getting opened by the program
         super("Journey Editor");
-        currLayout= 1;
+        currLayout= true;
 
         final mxGraph graph = new mxGraph();
         //create undo manager built in way to manage undo and redo operations
@@ -256,6 +256,7 @@ public class JourneyEditor extends JFrame {
 
         voidContext.add(undo);
 
+        this.getRootPane().registerKeyboardAction(undo.getActionListeners()[0],KeyStroke.getKeyStroke(KeyEvent.VK_Z,KeyEvent.CTRL_DOWN_MASK), graphComponent.WHEN_IN_FOCUSED_WINDOW);
         //copy and pasted above code to add Redo functionality
 
         undo = new JMenuItem("Redo");
@@ -270,6 +271,7 @@ public class JourneyEditor extends JFrame {
         });
 
         voidContext.add(undo);
+        this.getRootPane().registerKeyboardAction(undo.getActionListeners()[0],KeyStroke.getKeyStroke(KeyEvent.VK_R,KeyEvent.CTRL_DOWN_MASK), graphComponent.WHEN_IN_FOCUSED_WINDOW);
 
         JMenuItem menuItem = new JMenuItem("Change Layout");
         menuItem.setMnemonic(KeyEvent.VK_P);
@@ -278,25 +280,22 @@ public class JourneyEditor extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(currLayout == 1){
-                    currLayout+=1;
+                if(currLayout){
+                    currLayout=false;
 
                     mxHierarchicalLayout mxHierarchicalLayout = new mxHierarchicalLayout(graph);
                     //makes layout easier to follow when complexity rises
                     mxHierarchicalLayout.setFineTuning(true);
-                    mxHierarchicalLayout.setInterHierarchySpacing(40);
+                    mxHierarchicalLayout.setInterHierarchySpacing(50);
                     mxHierarchicalLayout.setParallelEdgeSpacing(30);
                     mxHierarchicalLayout.execute(graph.getDefaultParent());
 
                 }
-                else if(currLayout ==2){
-                    currLayout=1;
-
-                    mxCompactTreeLayout mxCompactTreeLayout = new mxCompactTreeLayout(graph);
-                    mxCompactTreeLayout.setNodeDistance(30);
-                    mxCompactTreeLayout.setGroupPadding(30);
-                    mxCompactTreeLayout.execute(graph.getDefaultParent());
-
+                else{
+                    currLayout=true;
+                    mxFastOrganicLayout mxFastOrganicLayout = new mxFastOrganicLayout(graph);
+                    mxFastOrganicLayout.setMinDistanceLimit(40);
+                    mxFastOrganicLayout.execute(graph.getDefaultParent());
                 }
             }
         });
