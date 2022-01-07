@@ -31,7 +31,6 @@ import com.mxgraph.io.mxCodec;
 import com.mxgraph.io.mxCodecRegistry;
 import com.mxgraph.io.mxModelCodec;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.layout.mxFastOrganicLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
@@ -85,6 +84,9 @@ public class JourneyEditor extends JFrame {
     private ArrayList<PartnerEntry> partnerDB;
     private ArrayList<ProductEntry> productDB;
 
+    //contains the colors for edges to help differentiate
+    private String[] edgeColors;
+
 
     private JourneyDB journeyDB;
     //setting up undohandler that will keep track of edits
@@ -100,7 +102,7 @@ public class JourneyEditor extends JFrame {
         //setting the title of the window getting opened by the program
         super("Journey Editor");
         currLayout= true;
-
+        edgeColors = new String[]{"#000000","#FF0000","#00FF00","#0000FF","#FFFF00","#00FFFF","#FF00FF"};
         final mxGraph graph = new mxGraph();
         //create undo manager built in way to manage undo and redo operations
         undoManager = new mxUndoManager();
@@ -273,9 +275,9 @@ public class JourneyEditor extends JFrame {
         voidContext.add(undo);
         this.getRootPane().registerKeyboardAction(undo.getActionListeners()[0],KeyStroke.getKeyStroke(KeyEvent.VK_R,KeyEvent.CTRL_DOWN_MASK), graphComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        JMenuItem menuItem = new JMenuItem("Change Layout");
+        JMenuItem menuItem = new JMenuItem("Apply Layout");
         menuItem.setMnemonic(KeyEvent.VK_P);
-        menuItem.getAccessibleContext().setAccessibleDescription("Change Layout");
+        menuItem.getAccessibleContext().setAccessibleDescription("Apply Layout");
         //new mxHierarchicalLayout(graph).execute(graph.getDefaultParent());
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -293,9 +295,14 @@ public class JourneyEditor extends JFrame {
                 }
                 else{
                     currLayout=true;
-                    mxFastOrganicLayout mxFastOrganicLayout = new mxFastOrganicLayout(graph);
-                    mxFastOrganicLayout.setMinDistanceLimit(40);
-                    mxFastOrganicLayout.execute(graph.getDefaultParent());
+                    //consider replacing this layout
+                    mxHierarchicalLayout mxHierarchicalLayout = new mxHierarchicalLayout(graph);
+                    //makes layout easier to follow when complexity rises
+                    mxHierarchicalLayout.setFineTuning(true);
+                    mxHierarchicalLayout.setInterHierarchySpacing(50);
+                    mxHierarchicalLayout.setParallelEdgeSpacing(30);
+                    mxHierarchicalLayout.execute(graph.getDefaultParent());
+
                 }
             }
         });
@@ -1107,14 +1114,15 @@ public class JourneyEditor extends JFrame {
                         cells) {
                     eventLabel.setId(Integer.parseInt(currentCell.getId()));
                     if(graphContains(graph, eventLabel.toString())){
-                        //gets the preexisting node
+                        //gets the pre-existing node
                         Object target = getNode(graph, eventLabel.toString());
                         //wont create new edges that are identical to existing ones
                         if(graph.getEdgesBetween(startpoint,target).length > 0){
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",startpoint,target,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(target).length);
+                            graph.insertEdge(parent,null,"",startpoint,target,"strokeColor="+color);
                         }
                     }
                     else {
@@ -1124,10 +1132,12 @@ public class JourneyEditor extends JFrame {
                         //makes the edge point from the older object to the newer object
                         Date tmpdate = currentCell.getStartDate();
                         if(tmpdate.after(getNodeDate((mxCell) addition))){
-                            graph.insertEdge(parent,null, "",startpoint,addition,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",startpoint,addition,"strokeColor="+color);
                         }
                         else{
-                            graph.insertEdge(parent,null,"",addition,startpoint,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",addition,startpoint,"strokeColor="+color);
                         }
                     }
                 }
@@ -1172,14 +1182,17 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,target,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(target).length);
+                            graph.insertEdge(parent,null,"",addition,target,"strokeColor="+color);
                         }
                     }
                     else {
                         Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        graph.insertEdge(parent,null, "Leads to",addition,cell,"Edge");
+                        String color = determineEdgeColor(graph.getEdges(addition).length);
+                        graph.insertEdge(parent,null,"Leads to",addition,cell,"strokeColor="+color);
+
                     }
                 }
 
@@ -1223,7 +1236,8 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,target,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(target).length);
+                            graph.insertEdge(parent,null,"",addition,target,"strokeColor="+color);
                         }
                     }
                     else {
@@ -1231,7 +1245,8 @@ public class JourneyEditor extends JFrame {
                         Object cell = graph.insertVertex(parent, eventLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Event");
                         v1+= 50;
                         v2+= 75;
-                        graph.insertEdge(parent,null, "Leads to",cell,addition,"Edge");
+                        String color = determineEdgeColor(graph.getEdges(addition).length);
+                        graph.insertEdge(parent,null,"Leads to",cell,addition,"strokeColor="+color);
                     }
                 }
 
@@ -1282,7 +1297,8 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,target,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(target).length);
+                            graph.insertEdge(parent,null,"",addition,target,"strokeColor="+color);
                         }
                     }
                     else {
@@ -1292,10 +1308,12 @@ public class JourneyEditor extends JFrame {
                         //makes the edge point from the older object to the newer object
                         Date tmpdate = currentCell.getDate();
                         if(tmpdate.after(getNodeDate((mxCell) cell))){
-                            graph.insertEdge(parent,null, "",addition,cell,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",addition,cell,"strokeColor="+color);
                         }
                         else{
-                            graph.insertEdge(parent,null,"",cell,addition,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",cell,addition,"strokeColor="+color);
                         }
                     }
                 }
@@ -1347,14 +1365,16 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,target,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(target).length);
+                            graph.insertEdge(parent,null,"",addition,target,"strokeColor="+color);
                         }
                     }
                     else {
                         Object cell = graph.insertVertex(parent, productLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Product");
                         v1+= 50;
                         v2+= 75;
-                        graph.insertEdge(parent,null, "",addition,cell,"Edge");
+                        String color = determineEdgeColor(graph.getEdges(addition).length);
+                        graph.insertEdge(parent,null,"",addition,cell,"strokeColor="+color);
                     }
                 }
 
@@ -1400,14 +1420,16 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,target,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(target).length);
+                            graph.insertEdge(parent,null,"",addition,target,"strokeColor="+color);
                         }
                     }
                     else {
                         Object cell = graph.insertVertex(parent, partnerLabel.toString(), currentCell.toString(),v1,v2,120, 50,"Partner");
                         v1+= 50;
                         v2+= 75;
-                        graph.insertEdge(parent,null, "",addition,cell,"Edge");
+                        String color = determineEdgeColor(graph.getEdges(addition).length);
+                        graph.insertEdge(parent,null,"",addition,cell,"strokeColor="+color);
                     }
                 }
 
@@ -1449,7 +1471,8 @@ public class JourneyEditor extends JFrame {
                             ;
                         }
                         else {
-                            graph.insertEdge(parent,null,"",addition,target,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(target).length);
+                            graph.insertEdge(parent,null,"",addition,target,"strokeColor="+color);
                         }
                     }
                     else {
@@ -1459,10 +1482,12 @@ public class JourneyEditor extends JFrame {
                         //makes the edge point from the older object to the newer object
                         Date tmpdate = currentCell.getDate();
                         if(tmpdate.after(getNodeDate((mxCell) cell))){
-                            graph.insertEdge(parent,null, "",addition,cell,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",addition,cell,"strokeColor="+color);
                         }
                         else{
-                            graph.insertEdge(parent,null,"",cell,addition,"Edge");
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",cell,addition,"strokeColor="+color);
                         }
                     }
                 }
@@ -1619,6 +1644,10 @@ public class JourneyEditor extends JFrame {
         }
         return null;
     }
+    //returns one of the colors of edge list
+    private String determineEdgeColor(int edges){
+        return edgeColors[edges % edgeColors.length];
+    }
 
     //Early testing to get used to all the new functions I will be using as part of this project
     public static void main(String[] args) throws SQLException {
@@ -1627,15 +1656,15 @@ public class JourneyEditor extends JFrame {
 
         //todo look into .bat file to save db name
 
-        //todo flip between english and french
+
 
         //todo adjust how database file is found
         //todo prevent moving of edges
         //todo warning on missing elements on loading
 
-        //todo fix node's content being overridden by other nodes
+
         //todo look into having classes put in a JAR file for
-        //todo check dates of elements to decide arrow direction
+
         //todo fix starting on event bug
         //todo add disclaimer/copyright notice
         JourneyEditor frame = new JourneyEditor();

@@ -132,7 +132,7 @@ public class JourneyDB {
             query = "Select first_name from main_Members";
         }
         else if(selection.equals("Event")){
-            query = "Select name_en from main_Event";
+            query = "Select name_en from main_Events";
         }
         else if(selection.equals("Grant")){
             query = "select title from main_Grants";
