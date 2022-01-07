@@ -127,9 +127,22 @@ public class MemberEntry extends DataEntry{
     //conditional toString method that by default prints name and last name
     public String toString(){
         String result = name + " " + lname;
-        String[] options= {date.toString(),email,business,faculty[0],phone,city};
+        String[] options;
+        String  tmpDate;
+        if(date ==null){
+            options= new String[]{null, email, business, faculty[0], phone, city};
+        }
+        else {
+            tmpDate = date.toString();
+            options = new String[]{tmpDate, email, business, faculty[0], phone, city};
+        }
         if(!english){
-            options= new String[]{date.toString(),email,business,faculty[1],phone,city};
+            if(date == null){
+                options= new String[]{null,email,business,faculty[1],phone,city};
+            }
+            else {
+                options= new String[]{date.toString(),email,business,faculty[1],phone,city};
+            }
         }
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){

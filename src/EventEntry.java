@@ -129,6 +129,35 @@ public class EventEntry extends DataEntry{
         else{
             themeList = null;
         }
+        String tmpStart;
+        String tmpEnd;
+        if(startDate ==null && endDate ==null){
+            String[] options= {null,evtType,null, notes,themeList};
+            for (int i =0; i< display.length; i++) {
+                if(display[i] && options[i]!=null){
+                    result = result + "\n" + options[i];
+                }
+            }
+            return result;
+        }
+        else if(startDate ==null){
+            String[] options= {null,evtType,"E: "+endDate.toString(), notes,themeList};
+            for (int i =0; i< display.length; i++) {
+                if(display[i] && options[i]!=null){
+                    result = result + "\n" + options[i];
+                }
+            }
+            return result;
+        }
+        else if (endDate==null){
+            String[] options= {"S: "+ startDate.toString(),evtType,null, notes,themeList};
+            for (int i =0; i< display.length; i++) {
+                if(display[i] && options[i]!=null){
+                    result = result + "\n" + options[i];
+                }
+            }
+            return result;
+        }
         String[] options= {"S: "+ startDate.toString(),evtType,"E: "+endDate.toString(), notes,themeList};
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){

@@ -126,7 +126,8 @@ public class JourneyEditor extends JFrame {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Microsoft Access","accdb");
         file.setFileFilter(filter);
         file.showOpenDialog(null);
-        String location = file.getSelectedFile().getName();
+        String location = file.getSelectedFile().getAbsolutePath();
+
 
         //Stylesheets that give nodes representing different data types different appearances
         //member stylesheet
