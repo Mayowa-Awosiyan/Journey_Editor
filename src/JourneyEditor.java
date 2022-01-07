@@ -26,7 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 © 2021 GitHub, Inc.
 
  */
-//Journey Editor Image taken from https://performance.conseil-dpc.com/decision/?attachment_id=6830&lang=en
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.io.mxCodecRegistry;
 import com.mxgraph.io.mxModelCodec;
