@@ -3,13 +3,13 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Summer_2021_Project_jar</output-path>
     <root id="archive" name="Summer 2021 Project.jar">
       <element id="module-output" name="Summer 2021 Project" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/ucanaccess-5.0.1.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/commons-logging-1.2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$USER_HOME$/Downloads/mxPdf.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/commons-lang3-3.8.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../jgraphx/lib/jgraphx.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/hsqldb-2.5.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/commons-lang3-3.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/mxPdf.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/jackcess-3.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/commons-logging-1.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/hsqldb-2.5.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../Libraries/UCanAccess/ucanaccess-5.0.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
