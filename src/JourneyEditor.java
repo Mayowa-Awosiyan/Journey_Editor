@@ -919,12 +919,23 @@ public class JourneyEditor extends JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BufferedImage image = mxCellRenderer.createBufferedImage(graph, null, 1, Color.WHITE, true, null);
-                try {
-                    //todo add save dialog box
-                    ImageIO.write(image, "PNG", new File("C:\\temp\\graph.png"));
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
+                BufferedImage image = mxCellRenderer.createBufferedImage(graph, null, 2, Color.WHITE, true, null);
+                //TODO: make the save dialog box usable, with many export formats
+                JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+                fileChooser.setDialogTitle("Save as");
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG image","png");
+                fileChooser.setFileFilter(filter);
+                int userSelection = fileChooser.showSaveDialog(graphComponent);
+                File fileToSave = fileChooser.getSelectedFile();
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    String filename=fileToSave.getAbsolutePath().toString();
+                    try {
+                        ImageIO.write(image, "PNG", new File(filename+".png"));
+                        JOptionPane.showMessageDialog( graphComponent, "PNG file saved to: " + filename+".png");
+                    } catch(IOException ioException) {
+                        ioException.printStackTrace();;
+                    }
                 }
             }
         });
