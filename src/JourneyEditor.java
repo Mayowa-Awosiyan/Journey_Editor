@@ -168,7 +168,7 @@ public class JourneyEditor extends JFrame {
 
 
         Hashtable<String,Object> partnerStyle = new Hashtable<>();
-        partnerStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_TRIANGLE);
+        partnerStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
         partnerStyle.put(mxConstants.STYLE_FILLCOLOR, "#00FF00");
         partnerStyle.put(mxConstants.STYLE_FONTCOLOR,"#000000");
         partnerStyle.put(mxConstants.STYLE_STROKECOLOR,"#00AA00");
@@ -1607,7 +1607,7 @@ public class JourneyEditor extends JFrame {
                 }
             }
         }
-        else if(point.getStyle().equals("Parnter")){
+        else if(point.getStyle().equals("Partner")){
             for (PartnerEntry member:
                     partnerDB) {
                 if(member.getId().equals(id)){
