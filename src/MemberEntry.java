@@ -17,7 +17,10 @@ public class MemberEntry extends DataEntry{
 
         super(name, id);
         this.name= name;
-        this.date = date;
+        if (date!=null)
+            this.date = date;
+        else
+            this.date = new Date();
         this.lname = lname;
         this.email = email;
         this.business = business;
@@ -32,7 +35,10 @@ public class MemberEntry extends DataEntry{
         super(name, id);
         this.name=name;
         this.id=id;
-        this.date=date;
+        if (date!=null)
+            this.date = date;
+        else
+            this.date = new Date();
         this.lname = lname;
         this.display= new boolean[]{false, false, false, false, false, false};
     }
@@ -127,22 +133,10 @@ public class MemberEntry extends DataEntry{
     //conditional toString method that by default prints name and last name
     public String toString(){
         String result = name + " " + lname;
-        String[] options;
-        String  tmpDate;
-        if(date ==null){
-            options= new String[]{null, email, business, faculty[0], phone, city};
-        }
-        else {
-            tmpDate = date.toString();
-            options = new String[]{tmpDate, email, business, faculty[0], phone, city};
-        }
+
+        String[] options= {date.toString(),email,business,faculty[0],phone,city};
         if(!english){
-            if(date == null){
-                options= new String[]{null,email,business,faculty[1],phone,city};
-            }
-            else {
-                options= new String[]{date.toString(),email,business,faculty[1],phone,city};
-            }
+            options= new String[]{date.toString(),email,business,faculty[1],phone,city};
         }
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){
