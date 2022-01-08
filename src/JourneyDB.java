@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class JourneyDB {
 
@@ -28,12 +29,19 @@ public class JourneyDB {
                 String id =resultSet.getString(1);
                 String fname= resultSet.getString(2);
                 String lname=resultSet.getString(3);
-                Date dateJ = (Date) resultSet.getDate(5);
                 String bui = resultSet.getString(4);
+                Boolean isGuest = resultSet.getBoolean("is_guest");
+                Date dateJ;
+                if (!isGuest)
+                    dateJ = (Date) resultSet.getDate(5);
+                else
+                    dateJ = (Date) resultSet.getDate(7);
+                if (dateJ==null)
+                    dateJ=new Date();
                 String email = resultSet.getString("email");
                 String facNum = resultSet.getString("faculty");
                 String[] fac = getEngAndFrench("Select name_en, name_fr from types_faculty where id ="+ facNum);
-                String phone = resultSet.getString("mobile_phone");
+                String phone = resultSet.getString("business_phone");
                 String city = resultSet.getString("city");
                 MemberEntry entry = new MemberEntry(fname,dateJ,id,lname,email,bui,fac,phone,city);
                 cells.add(entry);
@@ -59,7 +67,7 @@ public class JourneyDB {
                 Date dateJ = resultSet.getDate(4);
                 String notes = resultSet.getString(6);
                 int type = resultSet.getInt(7);
-                ArrayList<String[]> themes = getThemes("Select theme_id from relp_event_theme where event_id =" + id, id);
+                ArrayList<String[]> themes = getThemes("Select theme_id from relp_event_topic where event_id =" + id, id);
                 String[] types = getEngAndFrench("Select type_en, type_fr from types_event where id ="+type);
 
                 EventEntry entry = new EventEntry(fname,dateJ,id,lname,types,endDate,notes,themes);
@@ -245,7 +253,7 @@ public class JourneyDB {
         }
         for(String currId: selected){
             try{
-                query = "select name_en, name_fr from types_theme where theme_id ="+ currId;
+                query = "select name_en, name_fr from types_topic where theme_id ="+ currId;
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(query);
                 while (resultSet.next()){
