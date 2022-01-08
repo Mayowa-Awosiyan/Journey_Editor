@@ -1147,7 +1147,11 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         //makes the edge point from the older object to the newer object
                         Date tmpdate = currentCell.getStartDate();
-                        if(tmpdate.after(getNodeDate((mxCell) addition))){
+                        if(tmpdate ==null){
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",startpoint,addition,"strokeColor="+color);
+                        }
+                        else if(tmpdate.after(getNodeDate((mxCell) addition))){
                             String color = determineEdgeColor(graph.getEdges(addition).length);
                             graph.insertEdge(parent,null,"",startpoint,addition,"strokeColor="+color);
                         }
@@ -1323,7 +1327,11 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         //makes the edge point from the older object to the newer object
                         Date tmpdate = currentCell.getDate();
-                        if(tmpdate.after(getNodeDate((mxCell) cell))){
+                        if(tmpdate ==null){
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",cell,addition,"strokeColor="+color);
+                        }
+                        else if(tmpdate.after(getNodeDate((mxCell) cell))){
                             String color = determineEdgeColor(graph.getEdges(addition).length);
                             graph.insertEdge(parent,null,"",addition,cell,"strokeColor="+color);
                         }
@@ -1497,7 +1505,11 @@ public class JourneyEditor extends JFrame {
                         v2+= 75;
                         //makes the edge point from the older object to the newer object
                         Date tmpdate = currentCell.getDate();
-                        if(tmpdate.after(getNodeDate((mxCell) cell))){
+                        if(tmpdate ==null){
+                            String color = determineEdgeColor(graph.getEdges(addition).length);
+                            graph.insertEdge(parent,null,"",cell,addition,"strokeColor="+color);
+                        }
+                        else if(tmpdate.after(getNodeDate((mxCell) cell))){
                             String color = determineEdgeColor(graph.getEdges(addition).length);
                             graph.insertEdge(parent,null,"",addition,cell,"strokeColor="+color);
                         }

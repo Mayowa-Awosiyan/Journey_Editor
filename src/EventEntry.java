@@ -129,8 +129,7 @@ public class EventEntry extends DataEntry{
         else{
             themeList = null;
         }
-        String tmpStart;
-        String tmpEnd;
+
         if(startDate ==null && endDate ==null){
             String[] options= {null,evtType,null, notes,themeList};
             for (int i =0; i< display.length; i++) {

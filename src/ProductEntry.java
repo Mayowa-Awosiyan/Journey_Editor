@@ -116,8 +116,14 @@ public class ProductEntry extends DataEntry{
         else{
             prodType = type[1];
         }
-
-        String[] options= {date.toString(),String.valueOf(ongoing),String.valueOf(peerReviewed), doi,notes, prodType,stakes};
+        String tmpdate;
+        if (date== null){
+            tmpdate = null;
+        }
+        else {
+            tmpdate = date.toString();
+        }
+        String[] options= {tmpdate,String.valueOf(ongoing),String.valueOf(peerReviewed), doi,notes, prodType,stakes};
 
         for (int i =0; i< display.length; i++) {
             if(display[i] && options[i]!=null){
