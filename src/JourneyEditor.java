@@ -120,14 +120,19 @@ public class JourneyEditor extends JFrame {
 
 
         //getting the location of the database from the user
+        String location="";
         JFileChooser file= new JFileChooser();
-        file.setDialogTitle("Please select the database");
+        file.setDialogTitle("Please select the Access database");
         file.setAcceptAllFileFilterUsed(false);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Microsoft Access","accdb");
         file.setFileFilter(filter);
-        file.showOpenDialog(null);
-        String location = file.getSelectedFile().getAbsolutePath();
-
+        int result = file.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            location = file.getSelectedFile().getAbsolutePath();
+        } else if (result == JFileChooser.CANCEL_OPTION) {
+            System.out.println("Cancel was selected. Quitting the JourneyEditor.");
+            System.exit(0);
+        }
 
         //Stylesheets that give nodes representing different data types different appearances
         //member stylesheet
