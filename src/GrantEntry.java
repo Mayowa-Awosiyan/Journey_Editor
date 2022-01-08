@@ -85,21 +85,27 @@ public class GrantEntry extends DataEntry{
 
     public String toString(){
         String result = name;
-        /* todo fail safe for incomplete data entries
-        String[] options = new String[] {null, null, null, null, null, String.valueOf(amount)};
-        if(date == null && display[5]){
-            options =
+
+        String[] options;
+        if(english) {
+            options = new String[]{(date != null) ? "Submitted:" + date.toString() : "Submission date unknown",
+                    (recDate != null) ? "Received: " + recDate.toString() : "Not yet received",
+                    (finDate != null) ? "Finish: " + finDate.toString() : "Not yet finished",
+                    String.valueOf(source[0]),
+                    notes,
+                    "$"+String.valueOf(amount),
+                    lri?"From Institute":"",
+                    status};
         }
-        else if(finDate == null && display[5]){
-
-        }
-        else if(recDate == null && display[5])
-
-         */
-        String[] options= new String[]{date.toString(), "Recieved: "+recDate.toString(), "Finish: "+finDate.toString(), String.valueOf(source[0]), notes, String.valueOf(amount),String.valueOf(lri), status};
-
-        if(english){
-            options= new String[]{date.toString(), "Recieved: "+recDate.toString(), "Finish: "+finDate.toString(), String.valueOf(source[1]), notes, String.valueOf(amount),String.valueOf(lri), status};
+        else {
+            options= new String[]{(date!=null) ? "Soumise:"+date.toString() : "Date de soumission inconnue",
+                    (recDate!=null) ? "Reçue: "+recDate.toString() : "Pas encore reçue",
+                    (finDate!=null) ? "Terminée: "+finDate.toString() : "Pas encore terminée",
+                    String.valueOf(source[1]),
+                    notes,
+                    "$"+String.valueOf(amount),
+                    lri?"De l'Institut":"",
+                    status};
         }
         for (int i =0; i< options.length; i++) {
             if(display[i] && options[i]!=null){
