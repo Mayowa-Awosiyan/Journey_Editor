@@ -920,7 +920,6 @@ public class JourneyEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 BufferedImage image = mxCellRenderer.createBufferedImage(graph, null, 2, Color.WHITE, true, null);
-                //TODO: make the save dialog box usable, with many export formats
                 JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
                 fileChooser.setDialogTitle("Save as");
                 fileChooser.setAcceptAllFileFilterUsed(false);
@@ -1068,12 +1067,21 @@ public class JourneyEditor extends JFrame {
     public void startGraph(mxGraph graph, mxGraphComponent graphComponent){
 
         String[] choices =new String[] {"Member", "Product", "Grant","Partner","Event"};
-        String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","choices",
+        String selection = (String) JOptionPane.showInputDialog(graphComponent,"Choose what to populate your graph","Choices",
                 JOptionPane.QUESTION_MESSAGE,null,choices,choices[0]);
+        if(selection == null){
+            startGraph(graph,graphComponent);
+            return;
+        }
         ArrayList<String> tmp = journeyDB.getNames(selection);
         String[] targets = new String[tmp.size()];
         for (int i = 0; i < tmp.size(); i++) {
             targets[i] = tmp.get(i);
+        }
+        if(tmp.size() == 0){
+            JOptionPane.showMessageDialog(graphComponent, "There are no entries of that type in the database try again");
+            startGraph(graph,graphComponent);
+            return;
         }
         String finalSelection =(String) JOptionPane.showInputDialog(graphComponent, "Choose the "+ selection+ " you want to start with.", "Select an option",
                 JOptionPane.QUESTION_MESSAGE,null, targets,targets[0]);
@@ -1680,46 +1688,12 @@ public class JourneyEditor extends JFrame {
     //Early testing to get used to all the new functions I will be using as part of this project
     public static void main(String[] args) throws SQLException {
 
-
-
-        //todo look into .bat file to save db name
-
-
-
-        //todo adjust how database file is found
-        //todo prevent moving of edges
-        //todo warning on missing elements on loading
-
-
-        //todo look into having classes put in a JAR file for
-
-        //todo fix starting on event bug
-        //todo add disclaimer/copyright notice
         JourneyEditor frame = new JourneyEditor();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
-
-        /*
-        if(args.length == 1)
-        {
-            JourneyEditor(args[0]);
-        }
-        else {
-            frame = new JourneyEditor();
-        }
-
-         */
-
-        //sets the default size of the window default 400, 320
         frame.setSize(700, 620);
         //makes the window visible
         frame.setVisible(true);
-
-        //create edge context menu to create color based paths
-
-        //look into serialization for saving/exporting/loading
-        //look into JSON for saving/loading graphs as well
-        //text based beats binary based
     }
 }
